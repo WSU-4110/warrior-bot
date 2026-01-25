@@ -4,3 +4,5 @@ flake8
 isort
 mypy
 pre-commit
+mkdocs
+mkdocs-material

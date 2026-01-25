@@ -1,0 +1,51 @@
+:root {
+  --wsu-green: #006633;
+  --wsu-gold: #FFCC00;
+  --wsu-dark-green: #004d26;
+  --wsu-light-gold: #FFD633;
+}
+
+[data-md-color-primary=custom] {
+  --md-primary-fg-color: var(--wsu-green);
+  --md-primary-fg-color--light: var(--wsu-dark-green);
+  --md-primary-fg-color--dark: var(--wsu-dark-green);
+}
+
+[data-md-color-accent=custom] {
+  --md-accent-fg-color: var(--wsu-gold);
+  --md-accent-fg-color--transparent: rgba(255, 204, 0, 0.1);
+}
+
+.md-typeset a {
+  color: var(--wsu-green);
+}
+
+.md-typeset a:hover {
+  color: var(--wsu-dark-green);
+}
+
+.md-typeset code {
+  background-color: rgba(0, 102, 51, 0.05);
+  border: 1px solid rgba(0, 102, 51, 0.1);
+}
+
+.md-button {
+  background-color: var(--wsu-green);
+  border-color: var(--wsu-green);
+}
+
+.md-button:hover {
+  background-color: var(--wsu-dark-green);
+  border-color: var(--wsu-dark-green);
+}
+
+.md-button--primary {
+  background-color: var(--wsu-gold);
+  color: var(--wsu-dark-green);
+  border-color: var(--wsu-gold);
+}
+
+.md-button--primary:hover {
+  background-color: var(--wsu-light-gold);
+  border-color: var(--wsu-light-gold);
+}
