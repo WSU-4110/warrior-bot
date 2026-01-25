@@ -19,7 +19,7 @@ If you're on MacOS, we recommend [iTerm2](https://iterm2.com/)
 ## Setup (development)
 Ensure you have a version of [Python](https://www.python.org/downloads/) >= 3.10 installed on your machine.
 
-**Virtual Environment**
+#### **Virtual Environment**
 It's best that you use a [virtual environment](https://docs.python.org/3/library/venv.html) to both develop and test warrior-bot.
 
 ```bash
@@ -31,7 +31,7 @@ pip install -r requirements.txt # install all needed libraries to your virtual e
 
 deactivate # deactivate the environment
 ```
-**Install and run the CLI script**
+#### **Install and run the CLI script**
 To install the warrior-bot console script, run from root:
 ```bash
 pip install -e .
@@ -46,7 +46,7 @@ wb go degree works
 wb book --b state hall
 ```
 
-**pre-commit hooks**
+#### **pre-commit hooks**
 As a developer, you can install hooks to automatically do things like run `black`, `isort` or `flake8` on your files before they get committed.
 
 To configure this, we already provide you with a `.pre-commit-config.yaml` file which will set this up for you. Simply run:
