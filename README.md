@@ -5,6 +5,10 @@ Terminal assistant for Wayne State University students.
 warrior-bot is a CLI tool for Wayne State University staff and students. The idea is to make many of the things we need day to day easier to
 access and use through the terminal.
 
+You can access the documentation [here](wsu-4110.github.io/warrior-bot/). 
+
+Otherwise, some quick setup steps can be found below.
+
 ## Requirements
 - Python 3.10+
 - Access to a terminal
