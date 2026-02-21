@@ -1,7 +1,7 @@
 """Go command implementation."""
 
 import click
-
+import webbrowser
 
 @click.command()
 @click.argument("resource")
