@@ -3,6 +3,7 @@ black
 flake8
 isort
 mypy
+types-requests
 pre-commit
 mkdocs
 mkdocs-material
