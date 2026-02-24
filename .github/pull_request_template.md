@@ -4,7 +4,7 @@ To test my changes, run the following command:
 git checkout <branch-name>
 ```
 
-Then, you can run: 
+Then, you can run:
 ```bash
 pip install -e .
 ```
