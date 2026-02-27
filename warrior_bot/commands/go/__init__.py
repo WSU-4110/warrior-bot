@@ -15,6 +15,8 @@ def go(resource):
         webbrowser.open(url, new=1, autoraise=True)
     elif resource == "library":
         click.echo("Taking user to WSU Library site!")
+	url = 'https://library.wayne.edu/'
+	webbrowser.open(url, new=1, autoraise=True)
     elif resource == "bookstore":
         click.echo("Taking user to WSU Bookstore site!")
     else:
