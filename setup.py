@@ -10,6 +10,8 @@ setup(
         "beautifulsoup4",
         "click",
         "colorama",
+        "InquirerPy",
+        "playwright",
         "requests",
     ],
     entry_points={
