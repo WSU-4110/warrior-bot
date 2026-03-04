@@ -1,4 +1,6 @@
 beautifulsoup4
 click
 colorama
+InquirerPy
+playwright
 requests
