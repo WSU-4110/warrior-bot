@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup
 @click.argument("first_name")
 @click.argument("last_name")
 def where(first_name, last_name):
-    """Where command."""
+    """Where command Here is how to use:"""
 
     startTime = time.time()
     first_name = first_name.capitalize()

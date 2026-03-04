@@ -20,17 +20,9 @@ def repl() -> None:
         if not line:
             continue
 
-        if line.lower() in {"exit", "quit"}:
+        if line.lower() in {"exit", "quit"}: #Exit or Quit will close the program
             exit_screen.main(style="fancy", pause=False)
             return
-
-        if line.lower() == "help":
-
-            try:
-                cli.main(args=["--help"], prog_name="warrior-bot", standalone_mode=False)
-            except SystemExit:
-                pass
-            continue
 
         args = shlex.split(line)
 

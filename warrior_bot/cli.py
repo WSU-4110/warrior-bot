@@ -2,7 +2,7 @@
 
 import click
 
-from warrior_bot.commands import book, go, where
+from warrior_bot.commands import book, go, where, help
 
 
 @click.group()
@@ -15,3 +15,4 @@ def cli():
 cli.add_command(go.go)
 cli.add_command(where.where)
 cli.add_command(book.book)
+cli.add_command(help.help)
