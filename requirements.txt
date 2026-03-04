@@ -1,2 +1,4 @@
+beautifulsoup4
 click
-bs4
+colorama
+requests

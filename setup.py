@@ -7,7 +7,10 @@ setup(
     version="0.1.0",
     packages=find_packages(),
     install_requires=[
+        "beautifulsoup4",
         "click",
+        "colorama",
+        "requests",
     ],
     entry_points={
         "console_scripts": [
