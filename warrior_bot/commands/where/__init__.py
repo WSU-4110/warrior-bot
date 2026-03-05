@@ -38,7 +38,8 @@ def where(name, building):
         # could also be called in displayStaffInfo to tell users where to find a person
 
     else:
-        url = f"https://wayne.edu/people?type=people&q={" + ".join(name).title()}"
+        query = " + ".join(name).title()
+        url = f"https://wayne.edu/people?type=people&q={query}"
 
         try:
             response = requests.get(url)
