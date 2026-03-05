@@ -13,8 +13,8 @@ EMS_BASE = "https://ems.wayne.edu"
 EMS_HOME = f"{EMS_BASE}/EmsWebApp/"
 EMS_LOGIN = f"{EMS_BASE}/EmsWebApp/SamlAuth.aspx"
 EMS_ROOM_REQUEST = f"{EMS_BASE}/EmsWebApp/RoomRequest.aspx"
-SESSION_DIR = Path.home() / ".warrior-bot"
-SESSION_FILE = SESSION_DIR / "session.json"
+DATA_DIR = Path.home() / ".warrior-bot"
+BROWSER_DATA_DIR = DATA_DIR / "browser-data"
 
 
 def navigate_to_ems(page: Page) -> None:
@@ -95,20 +95,23 @@ def click_mfa_option(page: Page, index: int) -> None:
     page.wait_for_timeout(2000)
 
 
-def get_mfa_number_match(page: Page) -> str | None:
+def get_mfa_number_match(page: Page, timeout_ms: int = 30_000) -> str | None:
     """Scrape the number-match code shown on the MFA approval page (e.g. '84').
 
-    Waits for the number-match element to appear in the DOM after the MFA
-    option tile is clicked and the page transitions to the approval screen.
+    Polls for the number-match element to appear after the MFA option tile is
+    clicked and the page transitions to the approval screen.
     """
-    try:
-        page.wait_for_selector(
-            "#idRichContext_DisplaySign", state="visible", timeout=5_000
-        )
-        text = page.locator("#idRichContext_DisplaySign").inner_text().strip()
-        return text if text else None
-    except PwTimeout:
-        pass
+    deadline = time.time() + timeout_ms / 1000
+    while time.time() < deadline:
+        try:
+            el = page.locator("#idRichContext_DisplaySign")
+            if el.is_visible(timeout=2_000):
+                text = el.inner_text().strip()
+                if text:
+                    return text
+        except PwTimeout:
+            pass
+        page.wait_for_timeout(1_000)
     return None
 
 
@@ -149,8 +152,7 @@ def wait_for_ems_after_login(page: Page, timeout_ms: int = 120_000) -> None:
             if "Error.aspx" in cur_url:
                 error_count += 1
                 if error_count <= 3:
-                    target = EMS_ROOM_REQUEST if error_count <= 2 else EMS_HOME
-                    page.goto(target, wait_until="networkidle")
+                    page.goto(EMS_HOME, wait_until="networkidle")
                     handle_stay_signed_in(page)
                     page.wait_for_timeout(2000)
                 else:
@@ -165,50 +167,113 @@ def wait_for_ems_after_login(page: Page, timeout_ms: int = 120_000) -> None:
 
 
 def is_on_ems(page: Page) -> bool:
-    """Check if we're on a valid EMS page (not error, not login)."""
+    """Check if we're on a valid EMS page (not error, not login/sign-in)."""
     if EMS_BASE not in page.url:
         return False
     if "Error.aspx" in page.url:
         return False
+    if page.locator("#signin-panel").is_visible():
+        return False
     return True
 
 
-def clear_stale_session() -> None:
-    """Delete cached session file so we re-authenticate."""
-    if SESSION_FILE.exists():
-        SESSION_FILE.unlink()
+def handle_ems_sign_in(page: Page) -> None:
+    """Click the EMS 'Sign In' button if the sign-in panel is showing.
+
+    The EMS home page sometimes shows a sign-in panel even when we have
+    valid SSO cookies.  Clicking the button triggers the SSO redirect which
+    completes automatically if the session is still valid.
+    """
+    try:
+        sign_in_btn = page.get_by_role("button", name="Sign In")
+        if sign_in_btn.is_visible(timeout=2_000):
+            sign_in_btn.click()
+            page.wait_for_load_state("networkidle")
+            page.wait_for_timeout(3000)
+    except PwTimeout:
+        pass
+
+
+def clear_stale_session(page: Page) -> None:
+    """Clear cookies so we re-authenticate with a fresh session."""
+    page.context.clear_cookies()
+
+
+def _ensure_ems_home(page: Page) -> None:
+    """Make sure we're on a valid EMS home page, handling errors and sign-in."""
+    for attempt in range(3):
+        if is_on_ems(page) and "Error.aspx" not in page.url:
+            if page.locator("#signin-panel").is_visible():
+                handle_ems_sign_in(page)
+                page.wait_for_timeout(3000)
+                continue
+            return
+
+        page.goto(EMS_HOME, wait_until="networkidle")
+        page.wait_for_timeout(2000)
+
+        if page.locator("#signin-panel").is_visible():
+            handle_ems_sign_in(page)
+            page.wait_for_timeout(3000)
+
+
+def navigate_to_room_request(page: Page) -> None:
+    """Navigate to the reservation templates page via the UI.
+
+    Direct page.goto() to RoomRequest.aspx causes Error.aspx -- the EMS
+    server requires navigation through the application.
+    """
+    if "RoomRequest" in page.url:
+        return
+
+    _ensure_ems_home(page)
+
+    strategies = [
+        lambda: page.get_by_role("link", name="Create A Reservation").first,
+        lambda: page.locator("a[href*='RoomRequest']").first,
+        lambda: page.get_by_text("Create A Reservation").first,
+    ]
+
+    for strategy in strategies:
+        try:
+            link = strategy()
+            if link.is_visible(timeout=5_000):
+                link.click()
+                page.wait_for_load_state("networkidle")
+                page.wait_for_timeout(2000)
+                if "RoomRequest" in page.url:
+                    return
+        except (PwTimeout, Exception):
+            continue
+
+    raise PwTimeout(
+        "Could not navigate to 'Create A Reservation'. " f"Current URL: {page.url}"
+    )
 
 
 def scrape_templates(page: Page) -> list[dict[str, str]]:
     """Extract reservation templates (buildings) from the RoomRequest page."""
-    if not is_on_ems(page):
-        page.goto(EMS_HOME, wait_until="networkidle")
+    navigate_to_room_request(page)
 
-    create_link = page.locator(
-        "a:has-text('Create A Reservation'), "
-        "a:has-text('CREATE A RESERVATION'), "
-        "a:has-text('Create a Reservation')"
-    ).first
-
-    create_link.click()
-    page.wait_for_load_state("networkidle")
-    page.wait_for_timeout(2000)
+    try:
+        page.wait_for_selector("#templates-grid .btn-primary", timeout=15_000)
+    except PwTimeout:
+        page.wait_for_timeout(3000)
 
     templates: list[dict[str, str]] = []
 
-    rows = page.locator("#templates-grid .row[data-webapp='true']")
+    rows = page.locator("#templates-grid .row:has(.btn-primary)")
     count = rows.count()
 
     if count == 0:
-        rows = page.locator(
-            "div.row:has(a:has-text('book now'), button:has-text('book now'))"
-        )
+        rows = page.locator("#templates-grid .row")
         count = rows.count()
 
     for i in range(count):
         row = rows.nth(i)
-        name_el = row.locator(".ellipsis-text")
-        name = name_el.inner_text().strip() if name_el.count() > 0 else ""
+        name = row.locator(".ellipsis-text").inner_text(timeout=2_000).strip()
+        if not name:
+            name = row.inner_text().split("\n")[0].strip()
         if name:
             templates.append({"name": name, "index": str(i)})
 
@@ -216,14 +281,9 @@ def scrape_templates(page: Page) -> list[dict[str, str]]:
 
 
 def click_template_book_now(page: Page, index: int) -> None:
-    rows = page.locator("#templates-grid .row[data-webapp='true']")
-    if rows.count() == 0:
-        rows = page.locator(
-            "div.row:has(a:has-text('book now'), button:has-text('book now'))"
-        )
+    rows = page.locator("#templates-grid .row:has(.btn-primary)")
     row = rows.nth(index)
-    book_link = row.locator("a:has-text('book now'), button:has-text('book now')").first
-    book_link.click()
+    row.locator(".btn-primary").first.click()
     page.wait_for_load_state("networkidle")
     page.wait_for_timeout(2000)
 
@@ -256,7 +316,7 @@ def fill_end_time(page: Page, end_time: str) -> None:
 
 
 def click_search(page: Page) -> None:
-    page.locator("button.find-a-room").click()
+    page.locator("button.find-a-room").first.click()
     page.wait_for_load_state("networkidle")
     page.wait_for_timeout(3000)
 
@@ -279,6 +339,8 @@ def scrape_rooms(page: Page) -> list[dict[str, Any]]:
         if cells.count() < 2:
             continue
         room_name = cells.nth(1).inner_text().strip() if cells.count() > 1 else ""
+        if not room_name:
+            continue
         location = cells.nth(2).inner_text().strip() if cells.count() > 2 else ""
         floor = cells.nth(3).inner_text().strip() if cells.count() > 3 else ""
         capacity = cells.nth(5).inner_text().strip() if cells.count() > 5 else ""
@@ -291,15 +353,15 @@ def scrape_rooms(page: Page) -> list[dict[str, Any]]:
         if capacity:
             display += f" | Cap: {capacity}"
 
-        rooms.append({"name": display, "index": i})
+        rooms.append({"name": display, "row_index": i})
 
     return rooms
 
 
-def click_room_add(page: Page, room_index: int) -> None:
+def click_room_add(page: Page, row_index: int) -> None:
     """Click the green '+' add-to-cart icon on the given room row."""
     rows = page.locator("table#available-list tbody tr")
-    row = rows.nth(room_index)
+    row = rows.nth(row_index)
     add_btn = row.locator("a.add-to-cart, i.fa-plus-circle")
     add_btn.first.click()
     page.wait_for_timeout(2000)
@@ -332,9 +394,10 @@ def click_add_room_modal(page: Page) -> None:
 
 
 def click_next_step(page: Page) -> None:
-    page.locator("button.btn-success:has-text('Next Step')").click()
-    page.wait_for_load_state("networkidle")
-    page.wait_for_timeout(2000)
+    btn = page.locator("button#next-step-btn")
+    btn.first.wait_for(state="visible", timeout=10_000)
+    btn.first.click()
+    page.locator("#event-name").wait_for(state="visible", timeout=30_000)
 
 
 def get_event_type_options(page: Page) -> list[str]:
@@ -349,14 +412,20 @@ def fill_event_name(page: Page, name: str) -> None:
 
 def select_event_type(page: Page, event_type: str) -> None:
     page.locator("#event-type").select_option(label=event_type)
+    page.wait_for_timeout(1000)
 
 
 def fill_contact_phone(page: Page, phone: str) -> None:
-    page.locator("#1stContactPhone").fill(phone)
+    page.locator("#event-type").focus()
+    for _ in range(5):
+        page.keyboard.press("Tab")
+    page.keyboard.type(phone)
 
 
 def fill_contact_email(page: Page, email: str) -> None:
-    page.locator("#1stContactEmail").fill(email)
+    for _ in range(2):
+        page.keyboard.press("Tab")
+    page.keyboard.type(email)
 
 
 def fill_av_technology(page: Page, choice: str) -> None:
@@ -392,19 +461,12 @@ def fill_actual_event_time(page: Page, event_time: str) -> None:
 
 
 def click_create_reservation(page: Page) -> None:
-    page.locator("button.btn-success:has-text('Create Reservation')").click()
+    page.locator("button.btn-success:has-text('Create Reservation')").first.click()
     page.wait_for_load_state("networkidle")
     page.wait_for_timeout(3000)
 
 
-def save_session(page: Page) -> None:
-    SESSION_DIR.mkdir(parents=True, exist_ok=True)
-    page.context.storage_state(path=str(SESSION_FILE))
-
-
-def session_file_exists() -> bool:
-    return SESSION_FILE.exists()
-
-
-def get_session_path() -> str:
-    return str(SESSION_FILE)
+def get_browser_data_dir() -> str:
+    """Return the persistent browser profile path, creating it if needed."""
+    BROWSER_DATA_DIR.mkdir(parents=True, exist_ok=True)
+    return str(BROWSER_DATA_DIR)

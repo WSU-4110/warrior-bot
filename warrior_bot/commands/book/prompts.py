@@ -1,11 +1,41 @@
 """Terminal prompt helpers for the book command using click (sync, no asyncio)."""
 
-from datetime import date
+from __future__ import annotations
+
+from datetime import date, datetime, timedelta
+from difflib import SequenceMatcher
 from getpass import getpass
 from typing import Any
 
 import click
 from colorama import Fore, Style
+
+
+def _fuzzy_score(query: str, target: str) -> float:
+    """Return a 0-1 similarity score between *query* and *target*."""
+    q, t = query.lower(), target.lower()
+    if q == t:
+        return 1.0
+    if q in t:
+        return 0.9 + (len(q) / len(t)) * 0.1
+    return SequenceMatcher(None, q, t).ratio()
+
+
+def fuzzy_match_templates(
+    query: str, templates: list[dict[str, str]], threshold: float = 0.55
+) -> list[dict[str, str]]:
+    """Return templates matching *query*, best match first.
+
+    Exact substring matches are always included.  Fuzzy matches above
+    *threshold* fill the rest.
+    """
+    scored: list[tuple[float, dict[str, str]]] = []
+    for t in templates:
+        score = _fuzzy_score(query, t["name"])
+        if score >= threshold:
+            scored.append((score, t))
+    scored.sort(key=lambda x: x[0], reverse=True)
+    return [t for _, t in scored]
 
 
 def _numbered_menu(items: list[str], prompt_text: str) -> int:
@@ -16,13 +46,11 @@ def _numbered_menu(items: list[str], prompt_text: str) -> int:
     click.echo("")
     while True:
         raw = click.prompt(prompt_text, type=str)
-        # Allow searching by typing part of a name
         try:
             idx = int(raw) - 1
             if 0 <= idx < len(items):
                 return idx
         except ValueError:
-            # Search by substring
             matches = [
                 (i, item) for i, item in enumerate(items) if raw.lower() in item.lower()
             ]
@@ -48,9 +76,33 @@ def prompt_template(templates: list[dict[str, str]]) -> dict[str, str]:
     return templates[idx]
 
 
+MAX_DAYS_AHEAD = 11
+
+
 def prompt_date() -> str:
-    default = date.today().strftime("%m/%d/%Y")
-    return click.prompt("Date (MM/DD/YYYY)", default=default)
+    today = date.today()
+    max_date = today + timedelta(days=MAX_DAYS_AHEAD)
+    default = today.strftime("%m/%d/%Y")
+
+    while True:
+        raw = click.prompt("Date (MM/DD/YYYY)", default=default)
+        try:
+            parsed = datetime.strptime(raw, "%m/%d/%Y").date()
+        except ValueError:
+            click.echo(f"  {Fore.RED}Invalid format. Use MM/DD/YYYY.{Style.RESET_ALL}")
+            continue
+
+        if parsed < today:
+            click.echo(f"  {Fore.RED}Date cannot be in the past.{Style.RESET_ALL}")
+            continue
+        if parsed > max_date:
+            click.echo(
+                f"  {Fore.RED}EMS only allows bookings up to {MAX_DAYS_AHEAD} days "
+                f"ahead (by {max_date.strftime('%m/%d/%Y')}).{Style.RESET_ALL}"
+            )
+            continue
+
+        return raw
 
 
 def prompt_start_time() -> str:
