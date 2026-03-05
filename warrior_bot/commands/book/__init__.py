@@ -25,8 +25,18 @@ def _error(msg: str) -> None:
 
 
 @click.command()
-def book():
-    """Book a room on EMS (ems.wayne.edu) from the terminal."""
+@click.argument("building", nargs=-1)
+@click.option("--headed", is_flag=True, help="Show the browser window for debugging.")
+def book(building: tuple[str, ...], headed: bool):
+    """Book a room on EMS (ems.wayne.edu) from the terminal.
+
+    Optionally pass a BUILDING name to skip the template menu:
+
+    \b
+      wb book lounge space
+      wb book "state hall"
+      wb book STEM
+    """
     try:
         from playwright.sync_api import TimeoutError as PwTimeout
         from playwright.sync_api import sync_playwright
@@ -47,13 +57,17 @@ def book():
             _info("Session is still active -- skipping login.")
             return page
 
+        if page.locator("#signin-panel").is_visible():
+            _info("EMS sign-in page detected -- clicking Sign In...")
+            ems_pages.handle_ems_sign_in(page)
+
+            if ems_pages.is_on_ems(page):
+                _info("SSO completed automatically -- session restored.")
+                return page
+
         if "Error.aspx" in page.url:
             _info("Cached session is stale -- starting fresh...")
-            ems_pages.clear_stale_session()
-            browser = page.context.browser
-            page.context.close()
-            context = browser.new_context()
-            page = context.new_page()
+            ems_pages.clear_stale_session(page)
 
         _info("Redirecting to login...")
         ems_pages.navigate_to_login(page)
@@ -93,8 +107,12 @@ def book():
                 ems_pages.click_mfa_option(page, idx)
 
                 match_code = ems_pages.get_mfa_number_match(page)
-                if match_code:
-                    _step(f"Enter this number in your Authenticator app: {match_code}")
+                if not match_code:
+                    _error(
+                        "Could not retrieve the number match code. Please try again."
+                    )
+                    sys.exit(1)
+                _step(f"Enter this number in your Authenticator app: {match_code}")
                 _info("Waiting for verification...")
             else:
                 _step("Waiting for authentication to complete...")
@@ -110,20 +128,37 @@ def book():
         ems_pages.handle_stay_signed_in(page)
 
         _info("Authentication successful!")
-        ems_pages.save_session(page)
         return page
 
-    def select_template(page) -> None:
+    def select_template(page, query: str | None = None) -> None:
         _step("Loading reservation templates...")
 
         templates = ems_pages.scrape_templates(page)
 
         if not templates:
-            _error("No reservation templates found. " "Check your EMS permissions.")
+            _error("No reservation templates found on the page.")
+            _error(f"Current URL: {page.url}")
+            _error(f"Page title: {page.title()}")
             sys.exit(1)
 
         _info(f"Found {len(templates)} template(s).")
-        selected = prompts.prompt_template(templates)
+
+        if query:
+            matches = prompts.fuzzy_match_templates(query, templates)
+            if len(matches) == 1:
+                selected = matches[0]
+                _info(f"Auto-selected: {selected['name']}")
+            elif len(matches) > 1 and matches[0]["name"].lower() == query.lower():
+                selected = matches[0]
+                _info(f"Auto-selected: {selected['name']}")
+            elif matches:
+                _info(f"Multiple matches for '{query}':")
+                selected = prompts.prompt_template(matches)
+            else:
+                _info(f"No match for '{query}' -- showing all templates.")
+                selected = prompts.prompt_template(templates)
+        else:
+            selected = prompts.prompt_template(templates)
 
         _info(f"Selected: {selected['name']}")
         ems_pages.click_template_book_now(page, int(selected["index"]))
@@ -154,19 +189,10 @@ def book():
         selected_room = prompts.prompt_room(rooms)
 
         _info(f"Selected: {selected_room['name']}")
-        ems_pages.click_room_add(page, selected_room["index"])
+        ems_pages.click_room_add(page, selected_room["row_index"])
 
-        _step("Attendance & Setup Type")
         attendees = prompts.prompt_attendees()
         ems_pages.fill_attendees(page, attendees)
-
-        try:
-            setup_types = ems_pages.get_setup_type_options(page)
-            if setup_types:
-                setup_type = prompts.prompt_setup_type(setup_types)
-                ems_pages.select_setup_type(page, setup_type)
-        except Exception:
-            pass
 
         _info("Adding room to cart...")
         ems_pages.click_add_room_modal(page)
@@ -230,26 +256,35 @@ def book():
         ems_pages.click_create_reservation(page)
 
         _step("Reservation created successfully!")
-        ems_pages.save_session(page)
 
     _step("Starting EMS Room Booking")
 
     with sync_playwright() as pw:
-        launch_args: dict = {"headless": True}
+        launch_args = [
+            "--disable-blink-features=AutomationControlled",
+        ]
+        if not headed:
+            launch_args.append("--window-position=-32000,-32000")
 
-        if ems_pages.session_file_exists():
-            _info("Found saved session -- attempting reuse...")
-            context = pw.chromium.launch(**launch_args).new_context(
-                storage_state=ems_pages.get_session_path()
-            )
-        else:
-            context = pw.chromium.launch(**launch_args).new_context()
-
+        context = pw.chromium.launch_persistent_context(
+            ems_pages.get_browser_data_dir(),
+            headless=False,
+            viewport={"width": 1920, "height": 1080},
+            user_agent=(
+                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+            ),
+            args=launch_args,
+        )
+        context.set_default_timeout(120_000)
+        context.set_default_navigation_timeout(120_000)
         page = context.new_page()
+
+        building_query = " ".join(building).strip() or None
 
         try:
             page = authenticate(page)
-            select_template(page)
+            select_template(page, query=building_query)
             search_and_select_room(page)
             fill_and_submit_reservation(page)
         except PwTimeout as exc:
@@ -259,4 +294,4 @@ def book():
             _error(f"Unexpected error: {exc}")
             sys.exit(1)
         finally:
-            page.context.close()
+            context.close()
