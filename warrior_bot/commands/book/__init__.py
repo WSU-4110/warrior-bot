@@ -47,6 +47,14 @@ def book():
             _info("Session is still active -- skipping login.")
             return page
 
+        if "Error.aspx" in page.url:
+            _info("Cached session is stale -- starting fresh...")
+            ems_pages.clear_stale_session()
+            browser = page.context.browser
+            page.context.close()
+            context = browser.new_context()
+            page = context.new_page()
+
         _info("Redirecting to login...")
         ems_pages.navigate_to_login(page)
 
