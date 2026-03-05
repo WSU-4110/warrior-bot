@@ -1,6 +1,7 @@
 """Where command implementation."""
 
 import sys
+import threading
 import time
 
 import click
@@ -19,15 +20,14 @@ def where(name, building):
 
     click.echo(f"Finding {fullName}", nl= False)
 
-    # just for fun. Not necessary for code to function. Still working on it a bit
-    for _ in range(3):
-        # click.echo(".",nl = False)
-        sys.stdout.write(".")
-        sys.stdout.flush()
-        time.sleep(0.7)
-
+    #updated animation calls function later in file
+    stop = threading.Event()
+    animation = threading.Thread(target = loadingAnimation, args=(stop,))
+    animation.start()
 
     if building:
+        stop.set()
+        animation.join()
         click.echo("\r" + " " * 50 + "\r", nl = False)
         url = "https://maps.wayne.edu/all/" #maybe use this
         click.echo("Flagged as Building..."
@@ -54,6 +54,8 @@ def where(name, building):
                        for row in soup.select("table.table-stack tbody tr")]
 
         if not staff:
+            stop.set()
+            animation.join()
             click.echo("\r" + " " * 50 + "\r", nl = False)
             click.echo("\033[31m[ERROR] No information on this staff member found!\033[0m"
                        "\n Possible Issues: "
@@ -67,9 +69,13 @@ def where(name, building):
 
         count = len(staff)
         if count == 1:
+            stop.set()
+            animation.join()
             click.echo("\r" + " " * 50 + "\r", nl = False)
             click.echo(displayStaffInfo(fullName, soup))
         else:
+            stop.set()
+            animation.join()
             click.echo("\r" + " " * 50 + "\r", nl = False)
             #Could change to allow the user to select instructor directly
             click.echo(f"{count} instructors found. Please insert the name using wb where")
@@ -140,3 +146,14 @@ def displayStaffInfo(fullName, soup):
         )
 
     return infoString + errorString
+
+#animation function
+def loadingAnimation(stop):
+    while not stop.is_set():
+        for _ in range(3):
+            sys.stdout.write(".")
+            sys.stdout.flush()
+            time.sleep(0.7)
+        sys.stdout.write("\b" * 3 + " " * 3 + "\b" * 3)
+        sys.stdout.flush()
+
