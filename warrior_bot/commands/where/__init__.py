@@ -1,6 +1,7 @@
 """Where command implementation."""
 
 import sys
+import threading
 import time
 
 import click
@@ -19,16 +20,14 @@ def where(name, building):
 
     click.echo(f"Finding {fullName}", nl=False)
 
-    # just for fun. Not necessary for code to function. Still working on it a bit
-    for _ in range(3):
-        # click.echo(".",nl = False)
-        sys.stdout.write(".")
-        sys.stdout.flush()
-        time.sleep(0.7)
+    # Run the loading animation until a result path completes.
+    stop = threading.Event()
+    animation = threading.Thread(target=loadingAnimation, args=(stop,))
+    animation.start()
 
     if building:
-        click.echo("\r" + " " * 50 + "\r", nl=False)
-        url = "https://maps.wayne.edu/all/"  # maybe use this
+        stopAnimation(stop, animation)
+        url = "https://maps.wayne.edu/all/"
         click.echo(
             "Flagged as Building..."
             "\nThis Feature is currently non-functional."
@@ -38,15 +37,18 @@ def where(name, building):
         # could also be called in displayStaffInfo to tell users where to find a person
 
     else:
-        query = " + ".join(name).title()
+        query = "+".join(name).title()
         url = f"https://wayne.edu/people?type=people&q={query}"
 
         try:
             response = requests.get(url)
             response.raise_for_status()
         except requests.RequestException:
-            click.echo("\r" + " " * 50 + "\r", nl=False)
-            click.echo("\033[31m[ERROR] Could not gain access to URL\033[0m")
+            stopAnimation(stop, animation)
+            click.echo(
+                "\033[31m[ERROR] Could not gain access to URL\033[0m"
+                "\n Please make sure you have stable internet connection."
+            )
             return
 
         soup = BeautifulSoup(response.text, "html.parser")
@@ -57,26 +59,26 @@ def where(name, building):
         ]
 
         if not staff:
-            click.echo("\r" + " " * 50 + "\r", nl=False)
+            stopAnimation(stop, animation)
             click.echo(
                 "\033[31m[ERROR] No information on this staff member found!\033[0m"
                 "\n Possible Issues: "
-                "\n - Incorrect Spelling",
-                "\n - Instructor may be new",
+                "\n - Incorrect Spelling"
+                "\n - Instructor may be new"
                 "\n - Instructor may be a Teacher Assistant"
-                "\n For building use -building ot -b after the name"
-                "\n Please try again using wb where",
+                "\n For building use -building or -b after the name"
+                "\n Please try again using wb where"
             )
             click.echo(f"Command took {round(time.time() - startTime, 2)} seconds")
             return
 
         count = len(staff)
         if count == 1:
-            click.echo("\r" + " " * 50 + "\r", nl=False)
+            stopAnimation(stop, animation)
             click.echo(displayStaffInfo(fullName, soup))
         else:
-            click.echo("\r" + " " * 50 + "\r", nl=False)
-            # Could change to allow the user to select instructor directly
+            stopAnimation(stop, animation)
+            # Could change to allow the user to select instructor directly.
             click.echo(
                 f"{count} instructors found. Please insert the name using wb where"
             )
@@ -148,3 +150,20 @@ def displayStaffInfo(fullName, soup):
         )
 
     return infoString + errorString
+
+#animation function
+def loadingAnimation(stop):
+    while not stop.is_set():
+        for _ in range(3):
+            sys.stdout.write(".")
+            sys.stdout.flush()
+            time.sleep(0.7)
+        sys.stdout.write("\b" * 3 + " " * 3 + "\b" * 3)
+        sys.stdout.flush()
+
+
+def stopAnimation(stop, animation):
+    stop.set()
+    animation.join()
+    click.echo("\r" + " " * 50 + "\r", nl=False)
+
