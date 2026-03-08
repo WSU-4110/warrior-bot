@@ -3,6 +3,14 @@
 import click
 import webbrowser
 
+class URL_Command:
+    def __init__(self, name, url)P:
+        self.url = url;
+        self.name = name;
+    def execute(self):
+        click.echo("Executing go command.")
+        click.echo("Taking user to {self.name}.")
+
 @click.command()
 @click.argument("resource")
 def go(resource):
