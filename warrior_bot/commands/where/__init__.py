@@ -26,19 +26,23 @@ def where(name, building):
     animation.start()
 
     if building:
-        stop.set()
-        animation.join()
-        click.echo("\r" + " " * 50 + "\r", nl = False)
-        url = "https://maps.wayne.edu/all/" #maybe use this
-        click.echo("Flagged as Building..."
-                   "\nThis Feature is currently non-functional."
-                   f"\nFor building information go to {url}")
-        #this will read from a json file and return results.
-        # could also be called in displayStaffInfo to tell users where to find a person
-
-
+        strategy = BuildingSearch(name, fullName, animation, stop)
+        strategy.runBuildingSearch()
     else:
-        url = f"https://wayne.edu/people?type=people&q={"+".join(name).title()}"
+        strategy = StaffSearch(name, fullName, animation, stop)
+        strategy.runStaffSearch()
+
+    click.echo(f"Command took {round(time.time() - startTime,2)} seconds")
+
+class StaffSearch:
+    def __init__(self,name, fullName, animation, stop):
+        self.name = name
+        self.fullName = fullName
+        self.animation = animation
+        self.stop = stop
+
+    def runStaffSearch(self):
+        url = f"https://wayne.edu/people?type=people&q={"+".join(self.name).title()}"
 
         try:
             response = requests.get(url)
@@ -51,11 +55,11 @@ def where(name, building):
         soup = BeautifulSoup(response.text,"html.parser")
 
         staff = [row.find("td").get_text(strip=True)
-                       for row in soup.select("table.table-stack tbody tr")]
+                 for row in soup.select("table.table-stack tbody tr")]
 
         if not staff:
-            stop.set()
-            animation.join()
+            self.stop.set()
+            self.animation.join()
             click.echo("\r" + " " * 50 + "\r", nl = False)
             click.echo("\033[31m[ERROR] No information on this staff member found!\033[0m"
                        "\n Possible Issues: "
@@ -64,18 +68,17 @@ def where(name, building):
                        "\n - Instructor may be a Teacher Assistant"
                        "\n For building use -building ot -b after the name"
                        "\n Please try again using wb where")
-            click.echo(f"Command took {round(time.time() - startTime,2)} seconds")
             return
 
         count = len(staff)
         if count == 1:
-            stop.set()
-            animation.join()
+            self.stop.set()
+            self.animation.join()
             click.echo("\r" + " " * 50 + "\r", nl = False)
-            click.echo(displayStaffInfo(fullName, soup))
+            click.echo(self.displayStaffInfo(self.fullName, soup))
         else:
-            stop.set()
-            animation.join()
+            self.stop.set()
+            self.animation.join()
             click.echo("\r" + " " * 50 + "\r", nl = False)
             #Could change to allow the user to select instructor directly
             click.echo(f"{count} instructors found. Please insert the name using wb where")
@@ -84,68 +87,80 @@ def where(name, building):
 
         """End code for where command for Finding Instructors"""
 
+    def displayStaffInfo(self,fullName, soup):
 
-    click.echo(f"Command took {round(time.time() - startTime,2)} seconds")
+            RED = "\033[31m"
+            RESET = "\033[0m"
 
+            infoString = f"{fullName} "
+            errorString = ""
 
-#Additional Functions for more simple code
-def displayStaffInfo(fullName, soup):
+            row = soup.select_one("table.table-stack tbody tr")
+            col = row.findAll("td")
 
-    RED = "\033[31m"
-    RESET = "\033[0m"
+            title = col[1].get_text(strip=True)
+            dept = col[2].get_text(strip=True)
+            phone = col[3].get_text(strip=True)
+            email = col[4].get_text(strip=True)
 
-    infoString = f"{fullName} "
-    errorString = ""
+            if title:
+                infoString += f"has the title {title} and \n"
 
-    row = soup.select_one("table.table-stack tbody tr")
-    col = row.findAll("td")
+            if dept:
+                infoString += (
+                    f"works in the {dept} department. \nYou can find them at PLACEHOLDER.\n"
+                )
+            else:
+                errorString += (
+                        RED + "[ERROR] This staff member does not have a department.\n" + RESET
+                )
 
-    title = col[1].get_text(strip=True)
-    dept = col[2].get_text(strip=True)
-    phone = col[3].get_text(strip=True)
-    email = col[4].get_text(strip=True)
+            if email:
+                infoString += f"Their email is {email}.\n"
+            else:
+                errorString += (
+                        RED
+                        + "[ERROR] This staff member does not have a registered email.\n"
+                        + RESET
+                )
 
-    if title:
-        infoString += f"has the title {title} and \n"
+            if phone:
+                infoString += f"Their phone number is {phone}.\n"
+            else:
+                errorString += (
+                        RED
+                        + "[ERROR] This staff member does not have a registered phone number.\n"
+                        + RESET
+                )
 
-    if dept:
-        infoString += (
-            f"works in the {dept} department. \nYou can find them at PLACEHOLDER.\n"
-        )
-    else:
-        errorString += (
-            RED + "[ERROR] This staff member does not have a department.\n" + RESET
-        )
+            nameCol = col[0]
+            linkTag = nameCol.find("a")
+            if linkTag and linkTag.get("href"):
+                link = "https://wayne.edu" + linkTag["href"]
+                infoString += f"For more information on {fullName}, visit their web page: {link}\n"
+            else:
+                errorString += (
+                        RED + "[ERROR] This staff member does not have a web page link.\n" + RESET
+                )
 
-    if email:
-        infoString += f"Their email is {email}.\n"
-    else:
-        errorString += (
-            RED
-            + "[ERROR] This staff member does not have a registered email.\n"
-            + RESET
-        )
+            return infoString + errorString
 
-    if phone:
-        infoString += f"Their phone number is {phone}.\n"
-    else:
-        errorString += (
-            RED
-            + "[ERROR] This staff member does not have a registered phone number.\n"
-            + RESET
-        )
-
-    nameCol = col[0]
-    linkTag = nameCol.find("a")
-    if linkTag and linkTag.get("href"):
-        link = "https://wayne.edu" + linkTag["href"]
-        infoString += f"For more information on {fullName}, visit their web page: {link}\n"
-    else:
-        errorString += (
-            RED + "[ERROR] This staff member does not have a web page link.\n" + RESET
-        )
-
-    return infoString + errorString
+class BuildingSearch:
+    def __init__(self,name, fullName, animation, stop):
+        self.name = name
+        self.fullName = fullName
+        self.animation = animation
+        self.stop = stop
+    def runBuildingSearch(self):
+        self.stop.set()
+        self.animation.join()
+        click.echo("\r" + " " * 50 + "\r", nl = False)
+        url = "https://maps.wayne.edu/all/" #maybe use this
+        click.echo("Flagged as Building..."
+                   "\nThis Feature is currently non-functional."
+                   f"\nFor building information go to {url}")
+        #this will read from a json file and return results.
+        # could also be called in displayStaffInfo to tell users where to find a person
 
 #animation function
 def loadingAnimation(stop):
