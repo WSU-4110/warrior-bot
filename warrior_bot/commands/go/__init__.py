@@ -25,6 +25,3 @@ def go(resource):
         cmd.execute()
     else:
         click.echo("Invalid command")
-
-if __name__ == "__main__":
-    go()
