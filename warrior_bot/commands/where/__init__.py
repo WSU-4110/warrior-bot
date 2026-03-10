@@ -25,6 +25,7 @@ def where(name, building):
     animation = threading.Thread(target=loadingAnimation, args=(stop,))
     animation.start()
 
+
     if building:
         stopAnimation(stop, animation)
         url = "https://maps.wayne.edu/all/"
