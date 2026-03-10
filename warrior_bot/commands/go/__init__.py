@@ -5,8 +5,8 @@ import webbrowser
 
 class URL_Command:
     def __init__(self, name, url):
-        self.url = url;
         self.name = name;
+        self.url = url;
     def execute(self):
         click.echo("Executing go command.")
         click.echo("Taking user to {self.name}!")
