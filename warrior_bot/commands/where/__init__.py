@@ -25,10 +25,10 @@ def where(name, building):
     animation = threading.Thread(target = loadingAnimation, args=(stop,))
     animation.start()
 
+
     if building:
-        stop.set()
-        animation.join()
-        click.echo("\r" + " " * 50 + "\r", nl = False)
+        stopAnimation(stop,animation)
+
         url = "https://maps.wayne.edu/all/" #maybe use this
         click.echo("Flagged as Building..."
                    "\nThis Feature is currently non-functional."
@@ -44,8 +44,9 @@ def where(name, building):
             response = requests.get(url)
             response.raise_for_status()
         except requests.RequestException as e:
-            click.echo("\r" + " " * 50 + "\r", nl = False)
-            click.echo("\033[31m[ERROR] Could not gain access to URL\033[0m")
+            stopAnimation(stop,animation)
+            click.echo("\033[31m[ERROR] Could not gain access to URL\033[0m"
+                       "\n Please make sure you have stable internet connection.")
             return
 
         soup = BeautifulSoup(response.text,"html.parser")
@@ -54,9 +55,7 @@ def where(name, building):
                        for row in soup.select("table.table-stack tbody tr")]
 
         if not staff:
-            stop.set()
-            animation.join()
-            click.echo("\r" + " " * 50 + "\r", nl = False)
+            stopAnimation(stop,animation)
             click.echo("\033[31m[ERROR] No information on this staff member found!\033[0m"
                        "\n Possible Issues: "
                        "\n - Incorrect Spelling"
@@ -69,14 +68,10 @@ def where(name, building):
 
         count = len(staff)
         if count == 1:
-            stop.set()
-            animation.join()
-            click.echo("\r" + " " * 50 + "\r", nl = False)
+            stopAnimation(stop,animation)
             click.echo(displayStaffInfo(fullName, soup))
         else:
-            stop.set()
-            animation.join()
-            click.echo("\r" + " " * 50 + "\r", nl = False)
+            stopAnimation(stop,animation)
             #Could change to allow the user to select instructor directly
             click.echo(f"{count} instructors found. Please insert the name using wb where")
             for name in staff:
@@ -156,4 +151,10 @@ def loadingAnimation(stop):
             time.sleep(0.7)
         sys.stdout.write("\b" * 3 + " " * 3 + "\b" * 3)
         sys.stdout.flush()
+
+
+def stopAnimation(stop,animation):
+    stop.set()
+    animation.join()
+    click.echo("\r" + " " * 50 + "\r", nl = False)
 
