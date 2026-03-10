@@ -21,9 +21,11 @@ commands = {
 @click.command()
 @click.argument("resource")
 def go(resource):
-    """Go command."""
     cmd = commands.get(resource)
     if cmd:
         cmd.execute()
     else:
         click.echo("Invalid command")
+
+if __name__ == "__main__":
+    go()
