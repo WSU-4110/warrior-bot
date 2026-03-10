@@ -21,7 +21,7 @@ commands = {
 @click.command()
 @click.argument("resource")
 def go(resource):
-    ""Go command.""
+    """Go command."""
     cmd = commands.get(resource)
     if cmd:
         cmd.execute()
