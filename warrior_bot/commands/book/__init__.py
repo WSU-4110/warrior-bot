@@ -39,7 +39,6 @@ def book(building: tuple[str, ...], headed: bool):
     """
     try:
         from playwright.sync_api import TimeoutError as PwTimeout
-        from playwright.sync_api import sync_playwright
     except ImportError:
         _error(
             "Playwright is not installed. Run:\n"
@@ -259,31 +258,11 @@ def book(building: tuple[str, ...], headed: bool):
 
     _step("Starting EMS Room Booking")
 
-    with sync_playwright() as pw:
-        launch_args = [
-            "--disable-blink-features=AutomationControlled",
-        ]
-        if not headed:
-            launch_args.append("--window-position=-32000,-32000")
+    building_query = " ".join(building).strip() or None
 
-        context = pw.chromium.launch_persistent_context(
-            ems_pages.get_browser_data_dir(),
-            headless=False,
-            viewport={"width": 1920, "height": 1080},
-            user_agent=(
-                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-                "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
-            ),
-            args=launch_args,
-        )
-        context.set_default_timeout(120_000)
-        context.set_default_navigation_timeout(120_000)
-        page = context.new_page()
-
-        building_query = " ".join(building).strip() or None
-
+    with ems_pages.EMSBrowser(headed=headed) as browser:
         try:
-            page = authenticate(page)
+            page = authenticate(browser.page)
             select_template(page, query=building_query)
             search_and_select_room(page)
             fill_and_submit_reservation(page)
@@ -293,5 +272,3 @@ def book(building: tuple[str, ...], headed: bool):
         except Exception as exc:
             _error(f"Unexpected error: {exc}")
             sys.exit(1)
-        finally:
-            context.close()

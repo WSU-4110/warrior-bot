@@ -470,3 +470,73 @@ def get_browser_data_dir() -> str:
     """Return the persistent browser profile path, creating it if needed."""
     BROWSER_DATA_DIR.mkdir(parents=True, exist_ok=True)
     return str(BROWSER_DATA_DIR)
+
+
+class EMSBrowser:
+    """Manages a Playwright browser session using the Lazy Initialization pattern.
+
+    The Playwright engine, browser context, and page are heavyweight resources
+    (spawning a Chromium process, reading a persistent profile from disk).
+    Rather than creating them eagerly, each is deferred until first access via
+    properties that check for ``None`` and initialize on demand.
+    """
+
+    def __init__(self, headed: bool = False) -> None:
+        self._headed = headed
+        self._playwright: Any | None = None
+        self._context: Any | None = None
+        self._page: Page | None = None
+
+    @property
+    def playwright(self) -> Any:
+        """Lazily start the Playwright engine on first access."""
+        if self._playwright is None:
+            from playwright.sync_api import sync_playwright
+
+            self._playwright = sync_playwright().start()
+        return self._playwright
+
+    @property
+    def context(self) -> Any:
+        """Lazily launch the persistent browser context on first access."""
+        if self._context is None:
+            launch_args = ["--disable-blink-features=AutomationControlled"]
+            if not self._headed:
+                launch_args.append("--window-position=-32000,-32000")
+
+            self._context = self.playwright.chromium.launch_persistent_context(
+                get_browser_data_dir(),
+                headless=False,
+                viewport={"width": 1920, "height": 1080},
+                user_agent=(
+                    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                    "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+                ),
+                args=launch_args,
+            )
+            self._context.set_default_timeout(120_000)
+            self._context.set_default_navigation_timeout(120_000)
+        return self._context
+
+    @property
+    def page(self) -> Page:
+        """Lazily create a new browser page on first access."""
+        if self._page is None:
+            self._page = self.context.new_page()
+        return self._page
+
+    def close(self) -> None:
+        """Release all resources that were initialized."""
+        if self._context is not None:
+            self._context.close()
+        if self._playwright is not None:
+            self._playwright.stop()
+        self._page = None
+        self._context = None
+        self._playwright = None
+
+    def __enter__(self) -> "EMSBrowser":
+        return self
+
+    def __exit__(self, *args: Any) -> None:
+        self.close()
