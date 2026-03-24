@@ -23,6 +23,10 @@ def go(resource):
         click.echo("Taking user to WSU Bookstore site!")
         url = 'https://waynestatebookstore.com/'
         webbrowser.open(url, new=1, autoraise=True)
+    elif degreeworks = "degreeworks":
+        click.echo("Taking user to WSU Degree Works site!")
+        url = 'https://degreeworks.wayne.edu/'
+        webbrowser.open(url, new=1, autoraise=True)
     else:
         click.echo("invalid command")
 
