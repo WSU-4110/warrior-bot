@@ -3,7 +3,6 @@
 import sys
 import threading
 import time
-
 import click
 import requests
 from bs4 import BeautifulSoup
@@ -97,6 +96,9 @@ def displayStaffInfo(fullName, soup):
     RED = "\033[31m"
     RESET = "\033[0m"
 
+    BOLD = "\033[1m"
+
+
     infoString = f"{fullName} "
     errorString = ""
 
@@ -109,11 +111,11 @@ def displayStaffInfo(fullName, soup):
     email = col[4].get_text(strip=True)
 
     if title:
-        infoString += f"has the title {title} and \n"
+        infoString += f"- {title}\n"
 
     if dept:
         infoString += (
-            f"works in the {dept} department. \nYou can find them at PLACEHOLDER.\n"
+            f"Department: {BOLD}{dept}{RESET} department. \nYou can find them at PLACEHOLDER.\n"
         )
     else:
         errorString += (
@@ -121,21 +123,17 @@ def displayStaffInfo(fullName, soup):
         )
 
     if email:
-        infoString += f"Their email is {email}.\n"
+        infoString += f"Email: {BOLD}{email}{RESET}.\n"
     else:
         errorString += (
-            RED
-            + "[ERROR] This staff member does not have a registered email.\n"
-            + RESET
+                RED+ "[ERROR] This staff member does not have a registered email.\n"+ RESET
         )
 
     if phone:
-        infoString += f"Their phone number is {phone}.\n"
+        infoString += f"Phone Number: {BOLD}{phone}{RESET}.\n"
     else:
         errorString += (
-            RED
-            + "[ERROR] This staff member does not have a registered phone number.\n"
-            + RESET
+            RED + "[ERROR] This staff member does not have a registered phone number.\n" + RESET
         )
 
     nameCol = col[0]
