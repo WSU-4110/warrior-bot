@@ -24,7 +24,6 @@ def where(name, building):
     animation = threading.Thread(target=loadingAnimation, args=(stop,))
     animation.start()
 
-
     if building:
         stopAnimation(stop, animation)
         url = "https://maps.wayne.edu/all/"
@@ -98,7 +97,6 @@ def displayStaffInfo(fullName, soup):
 
     BOLD = "\033[1m"
 
-
     infoString = f"{fullName} "
     errorString = ""
 
@@ -114,9 +112,7 @@ def displayStaffInfo(fullName, soup):
         infoString += f"- {title}\n"
 
     if dept:
-        infoString += (
-            f"Department: {BOLD}{dept}{RESET} department. \nYou can find them at PLACEHOLDER.\n"
-        )
+        infoString += f"Department: {BOLD}{dept}{RESET} department. \nYou can find them at PLACEHOLDER.\n"
     else:
         errorString += (
             RED + "[ERROR] This staff member does not have a department.\n" + RESET
@@ -126,14 +122,18 @@ def displayStaffInfo(fullName, soup):
         infoString += f"Email: {BOLD}{email}{RESET}.\n"
     else:
         errorString += (
-                RED+ "[ERROR] This staff member does not have a registered email.\n"+ RESET
+            RED
+            + "[ERROR] This staff member does not have a registered email.\n"
+            + RESET
         )
 
     if phone:
         infoString += f"Phone Number: {BOLD}{phone}{RESET}.\n"
     else:
         errorString += (
-            RED + "[ERROR] This staff member does not have a registered phone number.\n" + RESET
+            RED
+            + "[ERROR] This staff member does not have a registered phone number.\n"
+            + RESET
         )
 
     nameCol = col[0]
@@ -150,7 +150,8 @@ def displayStaffInfo(fullName, soup):
 
     return infoString + errorString
 
-#animation function
+
+# animation function
 def loadingAnimation(stop):
     while not stop.is_set():
         for _ in range(3):
@@ -165,4 +166,3 @@ def stopAnimation(stop, animation):
     stop.set()
     animation.join()
     click.echo("\r" + " " * 50 + "\r", nl=False)
-
