@@ -72,10 +72,28 @@ def handle_ms_trust_prompt(page: Page) -> None:
         pass
 
 
+MFA_TYPE_AUTHENTICATOR = "authenticator"
+MFA_TYPE_TEXT = "text"
+
+_MFA_ALLOWED: list[tuple[str, str]] = [
+    ("authenticator", MFA_TYPE_AUTHENTICATOR),
+    ("text", MFA_TYPE_TEXT),
+]
+
+
+def _mfa_type_for(text: str) -> str | None:
+    """Return MFA_TYPE_* for a tile's text, or None if unsupported."""
+    lower = text.lower()
+    for keyword, kind in _MFA_ALLOWED:
+        if keyword in lower:
+            return kind
+    return None
+
+
 def get_mfa_options(page: Page) -> list[dict[str, str]]:
     """
-    Scrape MFA verification options from the Microsoft
-    'Verify your identity' page.
+    Scrape supported MFA options from the Microsoft 'Verify your identity'
+    page.  Only the Authenticator-app and Text-message tiles are returned.
     """
     options: list[dict[str, str]] = []
     tiles = page.locator("div.row.tile")
@@ -83,8 +101,9 @@ def get_mfa_options(page: Page) -> list[dict[str, str]]:
     for i in range(count):
         tile = tiles.nth(i)
         text = tile.inner_text().strip()
-        if text:
-            options.append({"name": text, "index": str(i)})
+        kind = _mfa_type_for(text)
+        if text and kind:
+            options.append({"name": text, "index": str(i), "type": kind})
     return options
 
 
@@ -92,6 +111,36 @@ def click_mfa_option(page: Page, index: int) -> None:
     """Click the selected MFA verification option."""
     tiles = page.locator("div.row.tile")
     tiles.nth(index).click()
+    page.wait_for_timeout(2000)
+
+
+def get_mfa_error(page: Page) -> str | None:
+    """Return the error message text if Microsoft shows a verification error."""
+    try:
+        el = page.locator("#idDiv_SAOTCS_ErrorMsg_OTC").first
+        if el.is_visible(timeout=2_000):
+            text = el.inner_text().strip()
+            if text:
+                return text
+    except PwTimeout:
+        pass
+    return None
+
+
+def wait_for_text_mfa_input(page: Page, timeout_ms: int = 15_000) -> bool:
+    """Return True when the SMS one-time-code input field appears."""
+    try:
+        page.wait_for_selector("#idTxtBx_SAOTCC_OTC", timeout=timeout_ms)
+        return True
+    except PwTimeout:
+        return False
+
+
+def submit_text_mfa_code(page: Page, code: str) -> None:
+    """Fill the SMS verification code and click Continue."""
+    page.locator("#idTxtBx_SAOTCC_OTC").fill(code)
+    page.locator("#idSubmit_SAOTCC_Continue").click()
+    page.wait_for_load_state("networkidle")
     page.wait_for_timeout(2000)
 
 

@@ -102,18 +102,40 @@ def book(building: tuple[str, ...], headed: bool):
             mfa_options = ems_pages.get_mfa_options(page)
             if mfa_options:
                 _step("Multi-Factor Authentication")
-                names = [o["name"] for o in mfa_options]
-                idx = prompts._numbered_menu(names, "Select verification method")
-                ems_pages.click_mfa_option(page, idx)
+                while True:
+                    names = [o["name"] for o in mfa_options]
+                    idx = prompts._numbered_menu(names, "Select verification method")
+                    selected_mfa = mfa_options[idx]
+                    ems_pages.click_mfa_option(page, int(selected_mfa["index"]))
 
-                match_code = ems_pages.get_mfa_number_match(page)
-                if not match_code:
-                    _error(
-                        "Could not retrieve the number match code. Please try again."
+                    if selected_mfa["type"] == ems_pages.MFA_TYPE_TEXT:
+                        if ems_pages.wait_for_text_mfa_input(page, timeout_ms=8_000):
+                            code = prompts.prompt_sms_code()
+                            _info("Submitting code...")
+                            ems_pages.submit_text_mfa_code(page, code)
+                            break
+                    else:
+                        match_code = ems_pages.get_mfa_number_match(
+                            page, timeout_ms=8_000
+                        )
+                        if match_code:
+                            _step(
+                                "Enter this number in your "
+                                f"Authenticator app: {match_code}"
+                            )
+                            _info("Waiting for verification...")
+                            break
+
+                    err = (
+                        ems_pages.get_mfa_error(page)
+                        or "Verification did not complete."
                     )
-                    sys.exit(1)
-                _step(f"Enter this number in your Authenticator app: {match_code}")
-                _info("Waiting for verification...")
+                    _error(f"Verification failed: {err}")
+                    _info("Please choose a different method.")
+                    mfa_options = ems_pages.get_mfa_options(page)
+                    if not mfa_options:
+                        _error("No MFA options available. Please try again.")
+                        sys.exit(1)
             else:
                 _step("Waiting for authentication to complete...")
 
