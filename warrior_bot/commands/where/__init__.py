@@ -3,6 +3,7 @@
 import sys
 import threading
 import time
+
 import click
 import requests
 from bs4 import BeautifulSoup
@@ -112,7 +113,10 @@ def displayStaffInfo(fullName, soup):
         infoString += f"- {title}\n"
 
     if dept:
-        infoString += f"Department: {BOLD}{dept}{RESET} department. \nYou can find them at PLACEHOLDER.\n"
+        infoString += (
+            f"Department: {BOLD}{dept}{RESET} department. \n"
+            "You can find them at PLACEHOLDER.\n"
+        )
     else:
         errorString += (
             RED + "[ERROR] This staff member does not have a department.\n" + RESET
