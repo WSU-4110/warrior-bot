@@ -264,7 +264,10 @@ def book(building: tuple[str, ...], headed: bool):
             "--disable-blink-features=AutomationControlled",
         ]
         if not headed:
-            launch_args.append("--window-position=-32000,-32000")
+            launch_args += [
+                "--window-position=-32000,-32000",
+                "--start-minimized",
+            ]
 
         context = pw.chromium.launch_persistent_context(
             ems_pages.get_browser_data_dir(),
@@ -279,6 +282,20 @@ def book(building: tuple[str, ...], headed: bool):
         context.set_default_timeout(120_000)
         context.set_default_navigation_timeout(120_000)
         page = context.new_page()
+
+        if not headed:
+            try:
+                cdp = context.new_cdp_session(page)
+                win = cdp.send("Browser.getWindowForTarget")
+                cdp.send(
+                    "Browser.setWindowBounds",
+                    {
+                        "windowId": win["windowId"],
+                        "bounds": {"windowState": "minimized"},
+                    },
+                )
+            except Exception:
+                pass
 
         building_query = " ".join(building).strip() or None
 
