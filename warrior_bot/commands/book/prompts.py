@@ -161,5 +161,9 @@ def prompt_event_time() -> str:
     return click.prompt("What is the actual event time?")
 
 
+def prompt_sms_code() -> str:
+    return click.prompt("Enter the verification code sent to your phone")
+
+
 def prompt_confirm(message: str = "Proceed?") -> bool:
     return click.confirm(message, default=True)
