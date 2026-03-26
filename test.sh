@@ -20,6 +20,7 @@ case "$COMMAND" in
     go)    pytest tests/test_go.py "$@" ;;
     where) pytest tests/test_where.py "$@" ;;
     book)  pytest tests/test_book.py "$@" ;;
+    help)  pytest tests/test_help.py "$@" ;;
     *)
         echo "Unknown alias: $COMMAND"
         echo "Available: cli, go, where, book (or blank for all)"
