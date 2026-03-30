@@ -24,7 +24,7 @@ def test_Academica(mockBrowser):
     assert result.exit_code == 0
     assert "Academica" in result.output
     url, new, autoraise = mockBrowser[0]
-    assert url == "https://academica.aws.wayne.edu/"
+    assert url == "http://academica.aws.wayne.edu/"
     assert new == 1
     assert autoraise is True
 
