@@ -74,8 +74,9 @@ def test_InvalidCommand(mockBrowser):
     result = runner.invoke(go_command, ["random"])
 
     assert result.exit_code == 0
-    assert "Invalid command" in result.output.lower()
+    assert "invalid command" in result.output.lower()
     assert mock_browser == []
+
 #6. Execution Message Unit Test
 def test_ExecMsg(mockBrowser):
     runner = CliRunner()
