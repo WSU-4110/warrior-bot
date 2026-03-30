@@ -75,7 +75,7 @@ def test_InvalidCommand(mockBrowser):
 
     assert result.exit_code == 0
     assert "invalid command" in result.output.lower()
-    assert mock_browser == []
+    assert mockBrowser == []
 
 #6. Execution Message Unit Test
 def test_ExecMsg(mockBrowser):
