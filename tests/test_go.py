@@ -66,3 +66,20 @@ def test_Degreeworks(mockBrowser):
     assert url == "https://degreeworks.wayne.edu/"
     assert new == 1
     assert autoraise is True
+
+#5. Invalid Command Unit Test
+def test_InvalidCommand(mockBrowser):
+    runner = CliRunner()
+
+    result = runner.invoke(go_command, ["random"])
+
+    assert result.exit_code == 0
+    assert "Invalid command" in result.output.lower()
+    assert mock_browser == []
+#6. Execution Message Unit Test
+def test_ExecMsg(mockBrowser):
+    runner = CliRunner()
+
+    result = runner.invoke(go_command, ["academica"])
+
+    assert "Executing go command" in result.output
