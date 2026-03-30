@@ -24,8 +24,8 @@ def academicaTest(mockBrowser):
     assert result.exit_code == 0
     assert "Academica" in result.output
     url, new, autoraise = mockBrowser[0]
-    assert url = "http://academica.aws.wayne.edu/"
-    assert new = 1
+    assert url == "http://academica.aws.wayne.edu/"
+    assert new == 1
     assert autoraise is True
 
 #2. Library Unit Test
@@ -37,7 +37,7 @@ def test_Library(mockBrowser):
     assert result.exit_code == 0
     assert "Library" in result.output
     url, new, autoraise = mockBrowser[0]
-    assert url == "http://library.wayne.edu/"
+    assert url == "https://library.wayne.edu/"
     assert new == 1
     assert autoraise is True
 
@@ -50,7 +50,7 @@ def test_Bookstore(mockBrowser):
     assert result.exit_code == 0
     assert "Bookstore" in result.output
     url, new, autoraise = mockBrowser[0]
-    assert url == "http://waynestatebookstore.com/"
+    assert url == "https://waynestatebookstore.com/"
     assert new == 1
     assert autoraise is True
 
@@ -63,6 +63,6 @@ def test_Degreeworks(mockBrowser):
     assert result.exit_code == 0
     assert "Degree Works" in result.output
     url, new, autoraise = mockBrowser[0]
-    assert url == "http://degreeworks.wayne.edu/"
+    assert url == "https://degreeworks.wayne.edu/"
     assert new == 1
     assert autoraise is True
