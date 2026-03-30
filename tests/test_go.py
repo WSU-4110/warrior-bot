@@ -16,7 +16,7 @@ def mockBrowser(monkeypatch):
     return opened
 
 #1. Academica Unit Test
-def academicaTest(mockBrowser):
+def test_Academica(mockBrowser):
     runner = CliRunner()
 
     result = runner.invoke(go_command, ["academica"])
