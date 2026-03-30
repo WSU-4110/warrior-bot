@@ -27,3 +27,42 @@ def academicaTest(mockBrowser):
     assert url = "http://academica.aws.wayne.edu/"
     assert new = 1
     assert autoraise is True
+
+#2. Library Unit Test
+def test_Library(mockBrowser):
+    runner = CliRunner()
+
+    result = runner.invoke(go_command, ["library"])
+
+    assert result.exit_code == 0
+    assert "Library" in result.output
+    url, new, autoraise = mockBrowser[0]
+    assert url == "http://library.wayne.edu/"
+    assert new == 1
+    assert autoraise is True
+
+#3. Bookstore Unit Test
+def test_Bookstore(mockBrowser):
+    runner = CliRunner()
+
+    result = runner.invoke(go_command, ["bookstore"])
+
+    assert result.exit_code == 0
+    assert "Bookstore" in result.output
+    url, new, autoraise = mockBrowser[0]
+    assert url == "http://waynestatebookstore.com/"
+    assert new == 1
+    assert autoraise is True
+
+#4. DegreeWorks Unit Test
+def test_Degreeworks(mockBrowser):
+    runner = CliRunner()
+
+    result = runner.invoke(go_command, ["degreeworks"])
+
+    assert result.exit_code == 0
+    assert "Degree Works" in result.output
+    url, new, autoraise = mockBrowser[0]
+    assert url == "http://degreeworks.wayne.edu/"
+    assert new == 1
+    assert autoraise is True
