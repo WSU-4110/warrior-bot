@@ -5,27 +5,28 @@ import webbrowser
 import click
 
 
+class URL_Command:
+    def __init__(self, name, url):
+        self.name = name
+        self.url = url
+
+    def execute(self):
+        click.echo("Executing go command.")
+        webbrowser.open(self.url, new=1, autoraise=True)
+
+
+commands = {
+    "academica": URL_Command("WSU Academica", "https://academica.aws.wayne.edu/"),
+    "library": URL_Command("WSU Library", "https://library.wayne.edu/"),
+    "bookstore": URL_Command("WSU Bookstore", "https://waynestatebookstore.com/"),
+}
+
+
 @click.command()
 @click.argument("resource")
 def go(resource):
-    """Go command."""
-    click.echo("Executing go command")
-
-    if resource == "academica":
-        click.echo("Taking user to WSU Academica site!")
-        url = "http://academica.aws.wayne.edu/"
-        webbrowser.open(url, new=1, autoraise=True)
-    elif resource == "library":
-        click.echo("Taking user to WSU Library site!")
-        url = "https://library.wayne.edu/"
-        webbrowser.open(url, new=1, autoraise=True)
-    elif resource == "bookstore":
-        click.echo("Taking user to WSU Bookstore site!")
-        url = "https://waynestatebookstore.com/"
-        webbrowser.open(url, new=1, autoraise=True)
-    elif resource == "degreeworks":
-        click.echo("Taking user to WSU Degree Works site!")
-        url = "https://degreeworks.wayne.edu/"
-        webbrowser.open(url, new=1, autoraise=True)
+    cmd = commands.get(resource)
+    if cmd:
+        cmd.execute()
     else:
-        click.echo("invalid command")
+        click.echo("Invalid command")

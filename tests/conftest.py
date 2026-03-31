@@ -15,6 +15,8 @@ def runner():
 @pytest.fixture
 def invoke(runner):
     """Shortcut: invoke the top-level CLI group."""
+
     def _invoke(*args, **kwargs):
         return runner.invoke(cli, args, catch_exceptions=False, **kwargs)
+
     return _invoke
