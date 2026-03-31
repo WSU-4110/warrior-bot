@@ -24,25 +24,6 @@ def _info(msg: str) -> None:
 def _error(msg: str) -> None:
     click.echo(f"{ERR_COLOR}   {msg}{Style.RESET_ALL}")
 
-class bookHelpCommand(click.Command): #Help command information
-    def format_help(self, ctx, formatter):
-        formatter.write_text("Book Command: Reserve rooms on EMS via headless Playwright.")
-        formatter.write_paragraph()
-
-        formatter.write_text("Usage: wb book - Starts the process, follow the instructions that follow.")
-        formatter.write_paragraph()
-
-        formatter.write_text("Optional:")
-        formatter.write_text("  Pass a BUILDING name to skip the template menu, I.e.:")
-        formatter.write_text("  wb book lounge space")
-        formatter.write_text('  wb book "state hall"')
-        formatter.write_text("  wb book STEM")
-        formatter.write_text("  help or --help - Show this message")
-        formatter.write_paragraph()
-
-        formatter.write_text("Help Menu:")
-        formatter.write_text("  wb help or wb --help")
-
 @click.command(cls=bookHelpCommand)
 @click.argument("building", nargs=-1)
 @click.option("--headed", is_flag=True, help="Show the browser window for debugging.")
