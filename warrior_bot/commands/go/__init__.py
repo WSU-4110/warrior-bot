@@ -1,5 +1,4 @@
 import webbrowser
-
 import click
 
 from warrior_bot.commands.help import showHelp
@@ -55,7 +54,6 @@ class goHelpCommand(click.Command):  # Help command information
         formatter.write_text("Help Menu:")
         formatter.write_text("  wb help or wb --help")
 
-
 @click.command(cls=goHelpCommand)
 @click.argument("resource", required=False)
 @click.pass_context
@@ -73,3 +71,4 @@ def go(ctx, resource):
         click.echo("Taking user to WSU Bookstore site!")
     else:
         click.echo("invalid command")
+
