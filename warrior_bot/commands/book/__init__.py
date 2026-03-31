@@ -6,6 +6,7 @@ import sys
 
 import click
 from colorama import Fore, Style
+from warrior_bot.commands.help import showHelp
 
 STEP_COLOR = Fore.GREEN
 ERR_COLOR = Fore.RED
@@ -23,20 +24,34 @@ def _info(msg: str) -> None:
 def _error(msg: str) -> None:
     click.echo(f"{ERR_COLOR}   {msg}{Style.RESET_ALL}")
 
+class bookHelpCommand(click.Command): #Help command information
+    def format_help(self, ctx, formatter):
+        formatter.write_text("Book Command: Reserve rooms on EMS via headless Playwright.")
+        formatter.write_paragraph()
 
-@click.command()
+        formatter.write_text("Usage: wb book - Starts the process, follow the instructions that follow.")
+        formatter.write_paragraph()
+
+        formatter.write_text("Optional:")
+        formatter.write_text("  Pass a BUILDING name to skip the template menu, I.e.:")
+        formatter.write_text("  wb book lounge space")
+        formatter.write_text('  wb book "state hall"')
+        formatter.write_text("  wb book STEM")
+        formatter.write_text("  help or --help - Show this message")
+        formatter.write_paragraph()
+
+        formatter.write_text("Help Menu:")
+        formatter.write_text("  wb help or wb --help")
+
+@click.command(cls=bookHelpCommand)
 @click.argument("building", nargs=-1)
 @click.option("--headed", is_flag=True, help="Show the browser window for debugging.")
-def book(building: tuple[str, ...], headed: bool):
-    """Book a room on EMS (ems.wayne.edu) from the terminal.
+@click.pass_context
+def book(ctx: click.Context, building: tuple[str, ...], headed: bool):
+    value = " ".join(building) if building else None
 
-    Optionally pass a BUILDING name to skip the template menu:
-
-    \b
-      wb book lounge space
-      wb book "state hall"
-      wb book STEM
-    """
+    if value == "help":
+        showHelp(ctx, value)
     try:
         from playwright.sync_api import TimeoutError as PwTimeout
         from playwright.sync_api import sync_playwright
