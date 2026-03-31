@@ -6,6 +6,7 @@ import sys
 
 import click
 from colorama import Fore, Style
+
 from warrior_bot.commands.help import showHelp
 
 STEP_COLOR = Fore.GREEN
@@ -24,12 +25,17 @@ def _info(msg: str) -> None:
 def _error(msg: str) -> None:
     click.echo(f"{ERR_COLOR}   {msg}{Style.RESET_ALL}")
 
-class bookHelpCommand(click.Command): #Help command information
+
+class bookHelpCommand(click.Command):  # Help command information
     def format_help(self, ctx, formatter):
-        formatter.write_text("Book Command: Reserve rooms on EMS via headless Playwright.")
+        formatter.write_text(
+            "Book Command: Reserve rooms on EMS via headless Playwright."
+        )
         formatter.write_paragraph()
 
-        formatter.write_text("Usage: wb book - Starts the process, follow the instructions that follow.")
+        formatter.write_text(
+            "Usage: wb book - Starts the process, follow the instructions that follow."
+        )
         formatter.write_paragraph()
 
         formatter.write_text("Optional:")
@@ -42,6 +48,7 @@ class bookHelpCommand(click.Command): #Help command information
 
         formatter.write_text("Help Menu:")
         formatter.write_text("  wb help or wb --help")
+
 
 @click.command(cls=bookHelpCommand)
 @click.argument("building", nargs=-1)

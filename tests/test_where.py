@@ -1,29 +1,39 @@
 """Tests for the 'where' command."""
+
 import pytest
 from bs4 import BeautifulSoup
-from warrior_bot.commands.where import where, displayStaffInfo, loadingAnimation, stopAnimation
 from click.testing import CliRunner
+
+from warrior_bot.commands.where import (
+    displayStaffInfo,
+    loadingAnimation,
+    stopAnimation,
+    where,
+)
 
 """Staff tests"""
 
-#test link creating link
+
+# test link creating link
 def test_create_url():
-    #following code from where command
+    # following code from where command
     name = ["First", "Last"]
     query = "+".join(name).title()
     url = f"https://wayne.edu/people?type=people&q={query}"
     assert "First+Last" in url
 
-#test runtime of program
-@pytest.mark.timeout(15) #timeout based on non-functional requirements
+
+# test runtime of program
+@pytest.mark.timeout(15)  # timeout based on non-functional requirements
 def test_runtime():
     runner = CliRunner()
-    result = runner.invoke(where, ["First","Last"])
+    result = runner.invoke(where, ["First", "Last"])
 
     assert result.exit_code == 0
-    assert "[ERROR]"  in result.output
+    assert "[ERROR]" in result.output
 
-#test HTML Parser with name
+
+# test HTML Parser with name
 def test_html_parser():
     html = """
     <table class="table-stack">
@@ -33,7 +43,7 @@ def test_html_parser():
     </table>
     """
 
-    #following code from where command
+    # following code from where command
     soup = BeautifulSoup(html, "html.parser")
     staff = [
         row.find("td").get_text(strip=True)
@@ -42,7 +52,8 @@ def test_html_parser():
 
     assert staff == ["First Last"]
 
-#test displayStaffInfo with all info found
+
+# test displayStaffInfo with all info found
 def test_display_all():
     html = """
     <table class="table-stack">
@@ -68,7 +79,8 @@ def test_display_all():
     assert "Phone" in result
     assert "https://wayne.edu" in result
 
-#test displayStaffInfo with no info found
+
+# test displayStaffInfo with no info found
 def test_display_errors():
 
     html = """
@@ -91,7 +103,8 @@ def test_display_errors():
 
     assert "[ERROR]" in result
 
-#Test Animation ends properly
+
+# Test Animation ends properly
 def test_end_animation():
     import threading
     import time
