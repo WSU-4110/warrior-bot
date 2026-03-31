@@ -7,32 +7,7 @@ import time
 import click
 import requests
 from bs4 import BeautifulSoup
-
-
-class whereHelpCommand(click.Command):  # Help command information
-    def format_help(self, ctx, formatter):
-
-        formatter.write_text(
-            "Where Command: Finds Faculty, Building, and Restaurant Information."
-        )
-        formatter.write_paragraph()
-
-        formatter.write_text("Usage: wb where [RESOURCE]")
-        formatter.write_paragraph()
-
-        formatter.write_text("RESOURCES:")
-        formatter.write_text("  faculty - Displays faculty information.")
-        formatter.write_text(
-            "  building  -  Gives building location information on WSU Campus."
-        )
-        formatter.write_text(
-            "  restaurant - Gives restaurant location information on WSU Campus."
-        )
-        formatter.write_text("  help or --help - Show this message")
-        formatter.write_paragraph()
-
-        formatter.write_text("Help Menu:")
-        formatter.write_text("  wb help or wb --help")
+from warrior_bot.commands.help import whereHelpCommand, showHelp
 
 
 @click.command(cls=whereHelpCommand)
