@@ -2,7 +2,9 @@
 
 import pytest
 from click.testing import CliRunner
+
 from warrior_bot.commands.go import go as go_command
+
 
 # Fixture for a mock browser
 @pytest.fixture
@@ -15,7 +17,8 @@ def mockBrowser(monkeypatch):
     monkeypatch.setattr("warrior_bot.commands.go.webbrowser.open", fakeOpen)
     return opened
 
-#1. Academica Unit Test
+
+# 1. Academica Unit Test
 def test_Academica(mockBrowser):
     runner = CliRunner()
 
@@ -28,7 +31,8 @@ def test_Academica(mockBrowser):
     assert new == 1
     assert autoraise is True
 
-#2. Library Unit Test
+
+# 2. Library Unit Test
 def test_Library(mockBrowser):
     runner = CliRunner()
 
@@ -41,7 +45,8 @@ def test_Library(mockBrowser):
     assert new == 1
     assert autoraise is True
 
-#3. Bookstore Unit Test
+
+# 3. Bookstore Unit Test
 def test_Bookstore(mockBrowser):
     runner = CliRunner()
 
@@ -54,7 +59,8 @@ def test_Bookstore(mockBrowser):
     assert new == 1
     assert autoraise is True
 
-#4. DegreeWorks Unit Test
+
+# 4. DegreeWorks Unit Test
 def test_Degreeworks(mockBrowser):
     runner = CliRunner()
 
@@ -67,7 +73,8 @@ def test_Degreeworks(mockBrowser):
     assert new == 1
     assert autoraise is True
 
-#5. Invalid Command Unit Test
+
+# 5. Invalid Command Unit Test
 def test_InvalidCommand(mockBrowser):
     runner = CliRunner()
 
@@ -77,7 +84,8 @@ def test_InvalidCommand(mockBrowser):
     assert "invalid command" in result.output.lower()
     assert mockBrowser == []
 
-#6. Execution Message Unit Test
+
+# 6. Execution Message Unit Test
 def test_ExecMsg(mockBrowser):
     runner = CliRunner()
 

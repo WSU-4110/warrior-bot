@@ -116,3 +116,60 @@ def test_end_animation():
     stopAnimation(stop, animationTest)
 
     assert not animationTest.is_alive()
+
+
+"""Location tests"""
+
+
+# test building flag triggers building path
+def test_building_flag():
+    runner = CliRunner()
+    result = runner.invoke(where, ["State", "Hall", "-building"])
+
+    assert result.exit_code == 0
+    assert "Flagged as Building" in result.output
+
+
+# test building shorthand flag works
+def test_building_shorthand_flag():
+    runner = CliRunner()
+    result = runner.invoke(where, ["State", "Hall", "-b"])
+
+    assert result.exit_code == 0
+    assert "Flagged as Building" in result.output
+
+
+# test building path includes maps URL
+def test_building_maps_url():
+    runner = CliRunner()
+    result = runner.invoke(where, ["State", "Hall", "-building"])
+
+    assert "https://maps.wayne.edu/all/" in result.output
+
+
+# test building path shows non-functional message
+def test_building_nonfunctional_message():
+    runner = CliRunner()
+    result = runner.invoke(where, ["State", "Hall", "-b"])
+
+    assert "non-functional" in result.output
+
+
+# test building runtime within non-functional requirements
+@pytest.mark.timeout(15)
+def test_building_runtime():
+    runner = CliRunner()
+    result = runner.invoke(where, ["Engineering", "-b"])
+
+    assert result.exit_code == 0
+    assert "Command took" in result.output
+
+
+# test building flag with single-word location name
+def test_building_single_word():
+    runner = CliRunner()
+    result = runner.invoke(where, ["Library", "-b"])
+
+    assert result.exit_code == 0
+    assert "Flagged as Building" in result.output
+    assert "https://maps.wayne.edu/all/" in result.output
