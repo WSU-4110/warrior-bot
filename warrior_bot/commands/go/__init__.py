@@ -1,7 +1,6 @@
 """Go command implementation."""
 
 import webbrowser
-
 import click
 
 
@@ -29,6 +28,7 @@ commands = {
 @click.command()
 @click.argument("resource")
 def go(resource):
+    resource = resource.lower()
     cmd = commands.get(resource)
     if cmd:
         cmd.execute()
