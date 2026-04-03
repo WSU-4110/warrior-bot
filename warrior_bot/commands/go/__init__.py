@@ -12,8 +12,12 @@ class URL_Command:
 
     def execute(self):
         click.echo("Executing go command.")
-        webbrowser.open(self.url, new=1, autoraise=True)
-
+        try:
+            success = webbrowser.open(self.url, new=1, autoraise=True)
+            if not success:
+                click.echo("ERROR: Could not access local browser.")
+        except Exception:
+            click.echo("ERROR: Could not access local browser.")
 
 commands = {
     "academica": URL_Command("WSU Academica", "https://academica.aws.wayne.edu/"),
