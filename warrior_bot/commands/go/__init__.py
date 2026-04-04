@@ -2,7 +2,7 @@
 
 import webbrowser
 import click
-
+import difflib
 
 class URL_Command:
     def __init__(self, name, url):
@@ -34,4 +34,9 @@ def go(resource):
     if cmd:
         cmd.execute()
     else:
-        click.echo("Invalid command")
+        matches = difflib.get_close_matches(resource, commands.keys(), n=1)
+        if matches:
+            click.echo(f"Invalid resource -- did you mean '{matches[0]}'?")
+        else:
+            click.echo("Invalid resource.")
+            click.echo("Available resources: " + ", ".join(commands.keys()))
