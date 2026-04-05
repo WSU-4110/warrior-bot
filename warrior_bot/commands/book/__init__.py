@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import os
+import subprocess
 import sys
 
 import click
@@ -255,14 +257,107 @@ def book(ctx: click.Context, building: tuple[str, ...], headed: bool):
 
         _step("Reservation created successfully!")
 
+    def _get_terminal_app() -> str:
+        """Identify the terminal that owns this process via env or PID tree."""
+        env_map = {
+            "iTerm.app": "iTerm2",
+            "Apple_Terminal": "Terminal",
+            "alacritty": "Alacritty",
+            "kitty": "kitty",
+            "WezTerm": "WezTerm",
+            "WarpTerminal": "Warp",
+            "Hyper": "Hyper",
+            "vscode": "Code",
+        }
+        term = os.environ.get("TERM_PROGRAM", "")
+        if term in env_map:
+            return env_map[term]
+
+        pid_terminals = {
+            "iTerm2": "iTerm2",
+            "Terminal": "Terminal",
+            "Alacritty": "Alacritty",
+            "kitty": "kitty",
+            "wezterm-gui": "WezTerm",
+            "Warp": "Warp",
+            "Hyper": "Hyper",
+            "Code": "Code",
+            "Cursor": "Cursor",
+        }
+        pid = os.getpid()
+        while pid > 1:
+            try:
+                out = subprocess.run(
+                    ["ps", "-o", "comm=", "-p", str(pid)],
+                    capture_output=True,
+                    text=True,
+                    timeout=3,
+                )
+                comm = out.stdout.strip().rsplit("/", 1)[-1]
+                if comm in pid_terminals:
+                    return pid_terminals[comm]
+            except Exception:
+                break
+            try:
+                out = subprocess.run(
+                    ["ps", "-o", "ppid=", "-p", str(pid)],
+                    capture_output=True,
+                    text=True,
+                    timeout=3,
+                )
+                parent = int(out.stdout.strip())
+                if parent == pid:
+                    break
+                pid = parent
+            except Exception:
+                break
+
+        return "Terminal"
+
+    def _minimize_browser(page) -> None:
+        """Minimize the Chromium window via CDP so users stay in the terminal."""
+        try:
+            cdp = page.context.new_cdp_session(page)
+            result = cdp.send("Browser.getWindowForTarget")
+            cdp.send(
+                "Browser.setWindowBounds",
+                {
+                    "windowId": result["windowId"],
+                    "bounds": {"windowState": "minimized"},
+                },
+            )
+            cdp.detach()
+        except Exception:
+            pass
+
+    def _focus_terminal() -> None:
+        """Bring the owning terminal back to the foreground."""
+        if sys.platform == "darwin":
+            target = _get_terminal_app()
+            try:
+                subprocess.run(
+                    ["osascript", "-e", f'tell application "{target}" to activate'],
+                    capture_output=True,
+                    timeout=3,
+                )
+            except Exception:
+                pass
+        else:
+            try:
+                subprocess.run(
+                    ["xdotool", "getactivewindow", "windowactivate"],
+                    capture_output=True,
+                    timeout=3,
+                )
+            except Exception:
+                pass
+
     _step("Starting EMS Room Booking")
 
     with sync_playwright() as pw:
         launch_args = [
             "--disable-blink-features=AutomationControlled",
         ]
-        if not headed:
-            launch_args.append("--window-position=-32000,-32000")
 
         context = pw.chromium.launch_persistent_context(
             ems_pages.get_browser_data_dir(),
@@ -277,6 +372,10 @@ def book(ctx: click.Context, building: tuple[str, ...], headed: bool):
         context.set_default_timeout(120_000)
         context.set_default_navigation_timeout(120_000)
         page = context.new_page()
+
+        if not headed:
+            _minimize_browser(page)
+            _focus_terminal()
 
         building_query = " ".join(building).strip() or None
 
