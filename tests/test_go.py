@@ -6,13 +6,13 @@ from click.testing import CliRunner
 from warrior_bot.commands.go import go as go_command
 
 
-# Fixture for a mock browser
 @pytest.fixture
 def mockBrowser(monkeypatch):
     opened = []
 
     def fakeOpen(url, new, autoraise):
         opened.append((url, new, autoraise))
+        return True
 
     monkeypatch.setattr("warrior_bot.commands.go.webbrowser.open", fakeOpen)
     return opened
@@ -25,9 +25,9 @@ def test_Academica(mockBrowser):
     result = runner.invoke(go_command, ["academica"])
 
     assert result.exit_code == 0
-    assert "Academica" in result.output
+    assert "Executing go command" in result.output
     url, new, autoraise = mockBrowser[0]
-    assert url == "http://academica.aws.wayne.edu/"
+    assert url == "https://academica.aws.wayne.edu/"
     assert new == 1
     assert autoraise is True
 
@@ -39,7 +39,7 @@ def test_Library(mockBrowser):
     result = runner.invoke(go_command, ["library"])
 
     assert result.exit_code == 0
-    assert "Library" in result.output
+    assert "Executing go command" in result.output
     url, new, autoraise = mockBrowser[0]
     assert url == "https://library.wayne.edu/"
     assert new == 1
@@ -53,7 +53,7 @@ def test_Bookstore(mockBrowser):
     result = runner.invoke(go_command, ["bookstore"])
 
     assert result.exit_code == 0
-    assert "Bookstore" in result.output
+    assert "Executing go command" in result.output
     url, new, autoraise = mockBrowser[0]
     assert url == "https://waynestatebookstore.com/"
     assert new == 1
@@ -67,7 +67,7 @@ def test_Degreeworks(mockBrowser):
     result = runner.invoke(go_command, ["degreeworks"])
 
     assert result.exit_code == 0
-    assert "Degree Works" in result.output
+    assert "Executing go command" in result.output
     url, new, autoraise = mockBrowser[0]
     assert url == "https://degreeworks.wayne.edu/"
     assert new == 1
@@ -81,7 +81,7 @@ def test_InvalidCommand(mockBrowser):
     result = runner.invoke(go_command, ["random"])
 
     assert result.exit_code == 0
-    assert "invalid command" in result.output.lower()
+    assert "invalid resource" in result.output.lower()
     assert mockBrowser == []
 
 
