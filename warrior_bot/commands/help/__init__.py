@@ -8,7 +8,9 @@ def showHelp(ctx: click.Context, value: str | None) -> None:
 
 
 def mainHelp(formatter) -> None:
-    formatter.write_text("Warrior Bot: Your campus companion for navigating Warrior life.")
+    formatter.write_text(
+        "Warrior Bot: Your campus companion for navigating Warrior life."
+    )
     formatter.write_paragraph()
 
     formatter.write_text("Usage: wb [COMMAND] [OPTIONS]")
@@ -50,9 +52,15 @@ class goHelpCommand(click.Command):
         formatter.write_paragraph()
 
         formatter.write_text("RESOURCES:")
-        formatter.write_text("  academica - Opens your browser to the Academica website")
-        formatter.write_text("  library - Opens your browser to the WSU Library website")
-        formatter.write_text("  bookstore - Opens your browser to the WSU Bookstore website")
+        formatter.write_text(
+            "  academica - Opens your browser to the Academica website"
+        )
+        formatter.write_text(
+            "  library - Opens your browser to the WSU Library website"
+        )
+        formatter.write_text(
+            "  bookstore - Opens your browser to the WSU Bookstore website"
+        )
         formatter.write_text("  help or --help - Show this message")
         formatter.write_paragraph()
 
@@ -65,7 +73,9 @@ class whereHelpCommand(click.Command):
         formatter.write_text("Usage: wb where RESOURCE")
         formatter.write_paragraph()
 
-        formatter.write_text("Where Command: Finds faculty, building, and restaurant information.")
+        formatter.write_text(
+            "Where Command: Finds faculty, building, and restaurant information."
+        )
         formatter.write_paragraph()
 
         formatter.write_text("RESOURCES:")
@@ -95,4 +105,3 @@ class bookHelpCommand(click.Command):
 
         formatter.write_text("Help Menu:")
         formatter.write_text("  wb help or wb --help")
-

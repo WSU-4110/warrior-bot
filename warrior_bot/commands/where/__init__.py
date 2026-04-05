@@ -7,7 +7,8 @@ import time
 import click
 import requests
 from bs4 import BeautifulSoup
-from warrior_bot.commands.help import whereHelpCommand, showHelp
+
+from warrior_bot.commands.help import whereHelpCommand
 
 
 @click.command(cls=whereHelpCommand)
