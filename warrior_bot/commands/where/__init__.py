@@ -8,12 +8,19 @@ import click
 import requests
 from bs4 import BeautifulSoup
 
+from warrior_bot.commands.help import whereHelpCommand
 
-@click.command()
+
+@click.command(cls=whereHelpCommand)
 @click.argument("name", nargs=-1)
 @click.option("-building", "-b", is_flag=True)
-def where(name, building):
-    """Where command."""
+@click.pass_context
+def where(ctx, name, building):
+
+    # Convert tuple to string for checking
+    if not name or (len(name) == 1 and name[0].lower() == "help"):
+        click.echo(ctx.get_help())
+        ctx.exit()
 
     fullName = " ".join(name).title()
     startTime = time.time()

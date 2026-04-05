@@ -7,6 +7,8 @@ import sys
 import click
 from colorama import Fore, Style
 
+from warrior_bot.commands.help import bookHelpCommand, showHelp
+
 STEP_COLOR = Fore.GREEN
 ERR_COLOR = Fore.RED
 INFO_COLOR = Fore.YELLOW
@@ -24,19 +26,15 @@ def _error(msg: str) -> None:
     click.echo(f"{ERR_COLOR}   {msg}{Style.RESET_ALL}")
 
 
-@click.command()
+@click.command(cls=bookHelpCommand)
 @click.argument("building", nargs=-1)
 @click.option("--headed", is_flag=True, help="Show the browser window for debugging.")
-def book(building: tuple[str, ...], headed: bool):
-    """Book a room on EMS (ems.wayne.edu) from the terminal.
+@click.pass_context
+def book(ctx: click.Context, building: tuple[str, ...], headed: bool):
+    value = " ".join(building) if building else None
 
-    Optionally pass a BUILDING name to skip the template menu:
-
-    \b
-      wb book lounge space
-      wb book "state hall"
-      wb book STEM
-    """
+    if value == "help":
+        showHelp(ctx, value)
     try:
         from playwright.sync_api import TimeoutError as PwTimeout
         from playwright.sync_api import sync_playwright
@@ -102,40 +100,18 @@ def book(building: tuple[str, ...], headed: bool):
             mfa_options = ems_pages.get_mfa_options(page)
             if mfa_options:
                 _step("Multi-Factor Authentication")
-                while True:
-                    names = [o["name"] for o in mfa_options]
-                    idx = prompts._numbered_menu(names, "Select verification method")
-                    selected_mfa = mfa_options[idx]
-                    ems_pages.click_mfa_option(page, int(selected_mfa["index"]))
+                names = [o["name"] for o in mfa_options]
+                idx = prompts._numbered_menu(names, "Select verification method")
+                ems_pages.click_mfa_option(page, idx)
 
-                    if selected_mfa["type"] == ems_pages.MFA_TYPE_TEXT:
-                        if ems_pages.wait_for_text_mfa_input(page, timeout_ms=8_000):
-                            code = prompts.prompt_sms_code()
-                            _info("Submitting code...")
-                            ems_pages.submit_text_mfa_code(page, code)
-                            break
-                    else:
-                        match_code = ems_pages.get_mfa_number_match(
-                            page, timeout_ms=8_000
-                        )
-                        if match_code:
-                            _step(
-                                "Enter this number in your "
-                                f"Authenticator app: {match_code}"
-                            )
-                            _info("Waiting for verification...")
-                            break
-
-                    err = (
-                        ems_pages.get_mfa_error(page)
-                        or "Verification did not complete."
+                match_code = ems_pages.get_mfa_number_match(page)
+                if not match_code:
+                    _error(
+                        "Could not retrieve the number match code. Please try again."
                     )
-                    _error(f"Verification failed: {err}")
-                    _info("Please choose a different method.")
-                    mfa_options = ems_pages.get_mfa_options(page)
-                    if not mfa_options:
-                        _error("No MFA options available. Please try again.")
-                        sys.exit(1)
+                    sys.exit(1)
+                _step(f"Enter this number in your Authenticator app: {match_code}")
+                _info("Waiting for verification...")
             else:
                 _step("Waiting for authentication to complete...")
 
@@ -286,10 +262,7 @@ def book(building: tuple[str, ...], headed: bool):
             "--disable-blink-features=AutomationControlled",
         ]
         if not headed:
-            launch_args += [
-                "--window-position=-32000,-32000",
-                "--start-minimized",
-            ]
+            launch_args.append("--window-position=-32000,-32000")
 
         context = pw.chromium.launch_persistent_context(
             ems_pages.get_browser_data_dir(),
@@ -304,20 +277,6 @@ def book(building: tuple[str, ...], headed: bool):
         context.set_default_timeout(120_000)
         context.set_default_navigation_timeout(120_000)
         page = context.new_page()
-
-        if not headed:
-            try:
-                cdp = context.new_cdp_session(page)
-                win = cdp.send("Browser.getWindowForTarget")
-                cdp.send(
-                    "Browser.setWindowBounds",
-                    {
-                        "windowId": win["windowId"],
-                        "bounds": {"windowState": "minimized"},
-                    },
-                )
-            except Exception:
-                pass
 
         building_query = " ".join(building).strip() or None
 
