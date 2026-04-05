@@ -1,8 +1,10 @@
 """Go command implementation."""
 
-import webbrowser
-import click
 import difflib
+import webbrowser
+
+import click
+
 
 class URL_Command:
     def __init__(self, name, url):
@@ -18,11 +20,12 @@ class URL_Command:
         except Exception:
             click.echo("ERROR: Could not access local browser.")
 
+
 commands = {
     "academica": URL_Command("WSU Academica", "https://academica.aws.wayne.edu/"),
     "library": URL_Command("WSU Library", "https://library.wayne.edu/"),
     "bookstore": URL_Command("WSU Bookstore", "https://waynestatebookstore.com/"),
-    "degreeworks": URL_Command("WSU Degree Works", "https://degreeworks.wayne.edu/")
+    "degreeworks": URL_Command("WSU Degree Works", "https://degreeworks.wayne.edu/"),
 }
 
 
