@@ -5,8 +5,6 @@ import webbrowser
 
 import click
 
-from warrior_bot.commands.help import showHelp
-
 
 class URL_Command:
     def __init__(self, name, url):
