@@ -353,6 +353,7 @@ def book(ctx: click.Context, building: tuple[str, ...], headed: bool):
                 pass
 
     _step("Starting EMS Room Booking")
+    _info("Press Ctrl+C at any time to abort.")
 
     with sync_playwright() as pw:
         launch_args = [
@@ -384,6 +385,9 @@ def book(ctx: click.Context, building: tuple[str, ...], headed: bool):
             select_template(page, query=building_query)
             search_and_select_room(page)
             fill_and_submit_reservation(page)
+        except KeyboardInterrupt:
+            _info("\nAborted by user.")
+            sys.exit(130)
         except PwTimeout as exc:
             _error(f"Operation timed out: {exc}")
             sys.exit(1)

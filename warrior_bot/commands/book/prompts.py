@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from datetime import date, datetime, timedelta
 from difflib import SequenceMatcher
 from getpass import getpass
@@ -105,12 +106,47 @@ def prompt_date() -> str:
         return raw
 
 
+_TIME_RE = re.compile(r"^\s*(\d{1,2}):(\d{2})\s*(AM|PM|am|pm|a\.m\.|p\.m\.)?\s*$")
+
+
+def _validate_time(raw: str) -> str | None:
+    """Return the cleaned time string if valid, else None."""
+    m = _TIME_RE.match(raw)
+    if not m:
+        return None
+    hour, minute = int(m.group(1)), int(m.group(2))
+    meridiem = m.group(3)
+    if meridiem:
+        if hour < 1 or hour > 12 or minute > 59:
+            return None
+    else:
+        if hour > 23 or minute > 59:
+            return None
+    return raw.strip()
+
+
 def prompt_start_time() -> str:
-    return click.prompt("Start time (e.g. 5:00 PM)")
+    while True:
+        raw = click.prompt("Start time (e.g. 5:00 PM)")
+        cleaned = _validate_time(raw)
+        if cleaned:
+            return cleaned
+        click.echo(
+            f"  {Fore.RED}Invalid time format. "
+            f"Use H:MM AM/PM (e.g. 5:00 PM).{Style.RESET_ALL}"
+        )
 
 
 def prompt_end_time() -> str:
-    return click.prompt("End time (e.g. 6:00 PM)")
+    while True:
+        raw = click.prompt("End time (e.g. 6:00 PM)")
+        cleaned = _validate_time(raw)
+        if cleaned:
+            return cleaned
+        click.echo(
+            f"  {Fore.RED}Invalid time format. "
+            f"Use H:MM AM/PM (e.g. 6:00 PM).{Style.RESET_ALL}"
+        )
 
 
 def prompt_room(rooms: list[dict[str, Any]]) -> dict[str, Any]:
