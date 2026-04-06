@@ -1,0 +1,202 @@
+{
+  "on_campus": [
+    {
+      "name": "Towers Cafe",
+      "address": "Towers Residential Suites, 655 W. Kirby, Detroit, MI 48202",
+      "phone": "(313) 577-2116",
+      "type": "Dining Hall",
+      "notes": "All-you-can-eat buffet. Accepts meal plans and Warrior dollars."
+    },
+    {
+      "name": "Starbucks",
+      "address": "Yousif B. Ghafari Hall, 695 Williams Mall, Detroit, MI 48202",
+      "phone": "(313) 577-4678",
+      "type": "Coffee",
+      "notes": "Located in the southeast corner of Ghafari Hall."
+    },
+    {
+      "name": "Starbucks (Student Center)",
+      "address": "WSU Student Center, 5221 Gullen Mall, Detroit, MI 48202",
+      "phone": null,
+      "type": "Coffee",
+      "notes": "Located inside the Student Center."
+    },
+    {
+      "name": "Einstein Brothers Bagels",
+      "address": "Yousif B. Ghafari Hall, 695 Williams Mall, Detroit, MI 48202",
+      "phone": "(313) 577-4848",
+      "type": "Bagels / Cafe",
+      "notes": "Freshly baked bagels, breakfast sandwiches, and coffee."
+    },
+    {
+      "name": "Jimmy John's",
+      "address": "Atchison Residence Hall, 5118 Anthony Wayne Dr, Detroit, MI 48202",
+      "phone": "(313) 832-7614",
+      "type": "Sandwiches",
+      "notes": "Gourmet subs and club sandwiches. Located in Atchison Hall."
+    },
+    {
+      "name": "McDonald's",
+      "address": "WSU Student Center, 5221 Gullen Mall, Detroit, MI 48202",
+      "phone": "(313) 832-5854",
+      "type": "Fast Food",
+      "notes": "Located on the main floor of the Student Center."
+    },
+    {
+      "name": "Taco Bell",
+      "address": "WSU Student Center, 5221 Gullen Mall, Detroit, MI 48202",
+      "phone": null,
+      "type": "Fast Food",
+      "notes": "Located inside the Student Center."
+    },
+    {
+      "name": "Choolaah",
+      "address": "5221 Gullen Mall, Detroit, MI 48202",
+      "phone": null,
+      "type": "Indian",
+      "notes": "Indian rotisserie restaurant on Gullen Mall."
+    },
+    {
+      "name": "Sushi Kabar",
+      "address": "WSU Student Center, 5221 Gullen Mall, Detroit, MI 48202",
+      "phone": null,
+      "type": "Sushi",
+      "notes": "Located inside the Student Center."
+    },
+    {
+      "name": "Tenders Love and Chicken",
+      "address": "WSU Student Center, 5221 Gullen Mall, Detroit, MI 48202",
+      "phone": null,
+      "type": "Fast Food",
+      "notes": "Chicken tenders concept located inside the Student Center."
+    },
+    {
+      "name": "Midtown Market",
+      "address": "WSU Student Center, 5221 Gullen Mall, Detroit, MI 48202",
+      "phone": null,
+      "type": "Convenience / Market",
+      "notes": "Convenience store on the first floor of the Student Center."
+    },
+    {
+      "name": "Erbert and Gerbert's",
+      "address": "Towers Residential Suites, 685 W. Kirby, Detroit, MI 48202",
+      "phone": null,
+      "type": "Sandwiches",
+      "notes": "Sandwich shop located in the Towers Residential Suites."
+    },
+    {
+      "name": "Pizzeria Venti",
+      "address": "Towers Residential Suites, 655 W. Kirby, Detroit, MI 48202",
+      "phone": "(313) 831-2810",
+      "type": "Pizza / Italian",
+      "notes": "Hand-made pizzas, gourmet salads, and savory pastas."
+    },
+    {
+      "name": "Halftime Cafe",
+      "address": "Medical Education Commons, 320 E. Canfield, Detroit, MI 48201",
+      "phone": null,
+      "type": "Cafe",
+      "notes": "Located in the Medical Education Commons building."
+    },
+    {
+      "name": "Beyond Juicery and Eatery",
+      "address": "5211 Anthony Wayne Dr, Detroit, MI 48201",
+      "phone": null,
+      "type": "Juice / Healthy",
+      "notes": "Fresh juices, smoothies, and healthy food options."
+    },
+    {
+      "name": "Haraz Coffee House",
+      "address": "119 Garfield St, Detroit, MI 48202",
+      "phone": null,
+      "type": "Coffee",
+      "notes": "Specialty coffee house near campus."
+    },
+    {
+      "name": "Leo's Coney Island",
+      "address": "5144 Anthony Wayne Dr, Detroit, MI 48202",
+      "phone": null,
+      "type": "Coney Island / Diner",
+      "notes": "Classic Detroit coney island next to 7-Eleven."
+    },
+    {
+      "name": "Gus's World Famous Chicken",
+      "address": "4101 Third Ave, Detroit, MI 48201",
+      "phone": null,
+      "type": "Fried Chicken",
+      "notes": "Famous fried chicken restaurant near campus."
+    },
+    {
+      "name": "Mezcal Mexican Restaurant",
+      "address": "51 W. Forrest Ave, Detroit, MI 48202",
+      "phone": null,
+      "type": "Mexican",
+      "notes": "Mexican restaurant near campus."
+    },
+    {
+      "name": "Insomnia Cookies",
+      "address": "5171 Anthony Wayne Dr, Detroit, MI 48202",
+      "phone": null,
+      "type": "Dessert / Bakery",
+      "notes": "Late-night cookie delivery and pickup on Anthony Wayne Drive."
+    },
+    {
+      "name": "1000 Degrees Pizza",
+      "address": "5154 Anthony Wayne Dr, Detroit, MI 48202",
+      "phone": null,
+      "type": "Pizza",
+      "notes": "Build-your-own pizza cooked in a 1000-degree oven."
+    }
+  ],
+  "anthony_wayne_drive": [
+    {
+      "name": "7-Eleven",
+      "address": "5154 Anthony Wayne Dr, Detroit, MI 48202",
+      "phone": null,
+      "type": "Convenience Store",
+      "notes": "WSU campus 7-Eleven. Does not sell alcohol or tobacco."
+    },
+    {
+      "name": "Moka & Co",
+      "address": "5165 Anthony Wayne Dr, Detroit, MI 48202",
+      "phone": null,
+      "type": "Coffee / Cafe",
+      "notes": "Coffee shop and cafe in the AWD Apartments."
+    },
+    {
+      "name": "Insomnia Cookies",
+      "address": "5171 Anthony Wayne Dr, Detroit, MI 48202",
+      "phone": null,
+      "type": "Dessert / Bakery",
+      "notes": "Late-night cookie shop. Open late for night-owl students."
+    },
+    {
+      "name": "Beyond Juicery and Eatery",
+      "address": "5211 Anthony Wayne Dr, Detroit, MI 48201",
+      "phone": null,
+      "type": "Juice / Healthy",
+      "notes": "Fresh juices, smoothies, and healthy bowls."
+    },
+    {
+      "name": "Leo's Coney Island",
+      "address": "5144 Anthony Wayne Dr, Detroit, MI 48202",
+      "phone": null,
+      "type": "Coney Island / Diner",
+      "notes": "Classic Detroit coney dogs, burgers, and breakfast all day."
+    },
+    {
+      "name": "Jimmy John's",
+      "address": "Atchison Residence Hall, 5118 Anthony Wayne Dr, Detroit, MI 48202",
+      "phone": "(313) 832-7614",
+      "type": "Sandwiches",
+      "notes": "Freaky fast sandwich delivery. Located in Atchison Hall."
+    },
+    {
+      "name": "1000 Degrees Pizza",
+      "address": "5154 Anthony Wayne Dr, Detroit, MI 48202",
+      "phone": null,
+      "type": "Pizza",
+      "notes": "Fast-fired build-your-own pizza. Also serves wings and salads."
+    }
+  ]
+}

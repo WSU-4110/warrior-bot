@@ -81,6 +81,9 @@ class whereHelpCommand(click.Command):
         formatter.write_text("RESOURCES:")
         formatter.write_text("  professor name - Search for a faculty member")
         formatter.write_text("  -building or -b - Search for building-related info")
+        formatter.write_text("  -restaurants or -r - Search for on-campus restaurants")
+        formatter.write_text("    --campus - On-campus dining only")
+        formatter.write_text("    --awd   - Anthony Wayne Drive only")
         formatter.write_text("  help or --help - Show this message")
         formatter.write_paragraph()
 
