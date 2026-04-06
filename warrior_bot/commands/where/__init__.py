@@ -5,165 +5,100 @@ import threading
 import time
 
 import click
-import requests
-from bs4 import BeautifulSoup
 
 from warrior_bot.commands.help import whereHelpCommand
+from warrior_bot.commands.where.where_facade import WhereFacade
 
 
 @click.command(cls=whereHelpCommand)
 @click.argument("name", nargs=-1)
-@click.option("-building", "-b", is_flag=True)
+@click.option("-building", "-b", is_flag=True, help="Search for a building address.")
+@click.option(
+    "-restaurants",
+    "-r",
+    is_flag=True,
+    help="List all on-campus and nearby restaurants.",
+)
+@click.option(
+    "--campus", is_flag=True, help="Show on-campus dining locations only (use with -r)."
+)
+@click.option(
+    "--awd",
+    is_flag=True,
+    help="Show Anthony Wayne Drive restaurants only (use with -r).",
+)
 @click.pass_context
-def where(ctx, name, building):
+def where(ctx, name, building, restaurants, campus, awd):
+    """Find buildings, instructors, and restaurants at Wayne State."""
 
-    # Convert tuple to string for checking
-    if not name or (len(name) == 1 and name[0].lower() == "help"):
+    if not name and not restaurants:
         click.echo(ctx.get_help())
         ctx.exit()
 
-    fullName = " ".join(name).title()
-    startTime = time.time()
+    if len(name) == 1 and name[0].lower() == "help":
+        click.echo(ctx.get_help())
+        ctx.exit()
 
-    click.echo(f"Finding {fullName}", nl=False)
+    facade = WhereFacade()
+    start_time = time.time()
 
-    # Run the loading animation until a result path completes.
-    stop = threading.Event()
-    animation = threading.Thread(target=loadingAnimation, args=(stop,))
-    animation.start()
+    if restaurants:
+        if name:
+            query = " ".join(name)
+            click.echo(f"Searching for restaurant: {query}", nl=False)
+            stop, animation = _start_animation()
+            result, _ = facade.search_restaurants_by_name(query)
+            _stop_animation(stop, animation)
+        elif awd:
+            click.echo("Loading Anthony Wayne Drive restaurants...", nl=False)
+            stop, animation = _start_animation()
+            result, _ = facade.search_restaurants(category="awd")
+            _stop_animation(stop, animation)
+        elif campus:
+            click.echo("Loading on-campus dining locations...", nl=False)
+            stop, animation = _start_animation()
+            result, _ = facade.search_restaurants(category="campus")
+            _stop_animation(stop, animation)
+        else:
+            click.echo("Loading all restaurants...", nl=False)
+            stop, animation = _start_animation()
+            result, _ = facade.search_restaurants(category="all")
+            _stop_animation(stop, animation)
+        click.echo(result)
 
-    if building:
-        stopAnimation(stop, animation)
+    elif building:
         url = "https://maps.wayne.edu/all/"
         click.echo(
-            "Flagged as Building..."
-            "\nThis Feature is currently non-functional."
-            f"\nFor building information go to {url}"
+            "Flagged as Building...\n"
+            "This Feature is currently non-functional.\n"
+            f"For building information go to {url}"
         )
-        # this will read from a json file and return results.
-        # could also be called in displayStaffInfo to tell users where to find a person
 
     else:
-        query = "+".join(name).title()
-        url = f"https://wayne.edu/people?type=people&q={query}"
+        full_name = " ".join(name).title()
+        click.echo(f"Finding {full_name}", nl=False)
+        stop, animation = _start_animation()
+        result, _ = facade.search_staff(full_name)
+        _stop_animation(stop, animation)
+        click.echo(result)
 
-        try:
-            response = requests.get(url)
-            response.raise_for_status()
-        except requests.RequestException:
-            stopAnimation(stop, animation)
-            click.echo(
-                "\033[31m[ERROR] Could not gain access to URL\033[0m"
-                "\n Please make sure you have stable internet connection."
-            )
-            return
-
-        soup = BeautifulSoup(response.text, "html.parser")
-
-        staff = [
-            row.find("td").get_text(strip=True)
-            for row in soup.select("table.table-stack tbody tr")
-        ]
-
-        if not staff:
-            stopAnimation(stop, animation)
-            click.echo(
-                "\033[31m[ERROR] No information on this staff member found!\033[0m"
-                "\n Possible Issues: "
-                "\n - Incorrect Spelling"
-                "\n - Instructor may be new"
-                "\n - Instructor may be a Teacher Assistant"
-                "\n For building use -building or -b after the name"
-                "\n Please try again using wb where"
-            )
-            click.echo(f"Command took {round(time.time() - startTime, 2)} seconds")
-            return
-
-        count = len(staff)
-        if count == 1:
-            stopAnimation(stop, animation)
-            click.echo(displayStaffInfo(fullName, soup))
-        else:
-            stopAnimation(stop, animation)
-            # Could change to allow the user to select instructor directly.
-            click.echo(
-                f"{count} instructors found. Please insert the name using wb where"
-            )
-            for name in staff:
-                click.echo(f" - {name}")
-
-        """End code for where command for Finding Instructors"""
-
-    click.echo(f"Command took {round(time.time() - startTime, 2)} seconds")
+    click.echo(f"Command took {round(time.time() - start_time, 2)} seconds")
 
 
-# Additional Functions for more simple code
-def displayStaffInfo(fullName, soup):
-
-    RED = "\033[31m"
-    RESET = "\033[0m"
-
-    BOLD = "\033[1m"
-
-    infoString = f"{fullName} "
-    errorString = ""
-
-    row = soup.select_one("table.table-stack tbody tr")
-    col = row.findAll("td")
-
-    title = col[1].get_text(strip=True)
-    dept = col[2].get_text(strip=True)
-    phone = col[3].get_text(strip=True)
-    email = col[4].get_text(strip=True)
-
-    if title:
-        infoString += f"- {title}\n"
-
-    if dept:
-        infoString += (
-            f"Department: {BOLD}{dept}{RESET} department. \n"
-            "You can find them at PLACEHOLDER.\n"
-        )
-    else:
-        errorString += (
-            RED + "[ERROR] This staff member does not have a department.\n" + RESET
-        )
-
-    if email:
-        infoString += f"Email: {BOLD}{email}{RESET}.\n"
-    else:
-        errorString += (
-            RED
-            + "[ERROR] This staff member does not have a registered email.\n"
-            + RESET
-        )
-
-    if phone:
-        infoString += f"Phone Number: {BOLD}{phone}{RESET}.\n"
-    else:
-        errorString += (
-            RED
-            + "[ERROR] This staff member does not have a registered phone number.\n"
-            + RESET
-        )
-
-    nameCol = col[0]
-    linkTag = nameCol.find("a")
-    if linkTag and linkTag.get("href"):
-        link = "https://wayne.edu" + linkTag["href"]
-        infoString += (
-            f"For more information on {fullName}, visit their web page: {link}\n"
-        )
-    else:
-        errorString += (
-            RED + "[ERROR] This staff member does not have a web page link.\n" + RESET
-        )
-
-    return infoString + errorString
+def _start_animation() -> tuple[threading.Event, threading.Thread]:
+    stop = threading.Event()
+    animation = threading.Thread(target=_loading_animation, args=(stop,))
+    animation.start()
+    return stop, animation
 
 
-# animation function
-def loadingAnimation(stop):
+def _stop_animation(stop: threading.Event, animation: threading.Thread) -> None:
+    stop.set()
+    animation.join()
+    click.echo("\r" + " " * 50 + "\r", nl=False)
+
+
+def _loading_animation(stop: threading.Event) -> None:
     while not stop.is_set():
         for _ in range(3):
             sys.stdout.write(".")
@@ -171,9 +106,3 @@ def loadingAnimation(stop):
             time.sleep(0.7)
         sys.stdout.write("\b" * 3 + " " * 3 + "\b" * 3)
         sys.stdout.flush()
-
-
-def stopAnimation(stop, animation):
-    stop.set()
-    animation.join()
-    click.echo("\r" + " " * 50 + "\r", nl=False)
