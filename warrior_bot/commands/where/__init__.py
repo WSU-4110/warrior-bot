@@ -12,10 +12,11 @@ from warrior_bot.commands.where.where_facade import WhereFacade
 
 @click.command(cls=whereHelpCommand)
 @click.argument("name", nargs=-1)
-@click.option("-building", "-b", is_flag=True, help="Search for a building address.")
+@click.option("--building", "--b", is_flag=True, help="Search for a building address.")
+@click.option("--staff", "--s", is_flag=True, help="Search for a staff member")
 @click.option(
-    "-restaurants",
-    "-r",
+    "--restaurants",
+    "--r",
     is_flag=True,
     help="List all on-campus and nearby restaurants.",
 )
@@ -28,7 +29,7 @@ from warrior_bot.commands.where.where_facade import WhereFacade
     help="Show Anthony Wayne Drive restaurants only (use with -r).",
 )
 @click.pass_context
-def where(ctx, name, building, restaurants, campus, awd):
+def where(ctx, name, building, staff, restaurants, campus, awd):
     """Find buildings, instructors, and restaurants at Wayne State."""
 
     if not name and not restaurants:
@@ -74,13 +75,16 @@ def where(ctx, name, building, restaurants, campus, awd):
             f"For building information go to {url}"
         )
 
-    else:
+    elif staff:
         full_name = " ".join(name).title()
         click.echo(f"Finding {full_name}", nl=False)
         stop, animation = _start_animation()
         result, _ = facade.search_staff(full_name)
         _stop_animation(stop, animation)
         click.echo(result)
+
+    else:
+        click.echo(f"\033[31mNo Flag used. Type Help for more information\033[0m")
 
     click.echo(f"Command took {round(time.time() - start_time, 2)} seconds")
 
