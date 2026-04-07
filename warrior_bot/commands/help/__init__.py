@@ -53,6 +53,7 @@ class goHelpCommand(click.Command):
         formatter.write_text("  academica - Opens your browser to the Academica website")
         formatter.write_text("  library - Opens your browser to the WSU Library website")
         formatter.write_text("  bookstore - Opens your browser to the WSU Bookstore website")
+        formatter.write_text("  degreeworks - Opens your browser to DegreeWorks")
         formatter.write_text("  help or --help - Show this message")
         formatter.write_paragraph()
 
