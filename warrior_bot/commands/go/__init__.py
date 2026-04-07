@@ -4,7 +4,7 @@ import difflib
 import webbrowser
 
 import click
-
+from warrior_bot.commands.help import goHelpCommand
 
 class URL_Command:
     def __init__(self, name, url):
@@ -29,36 +29,18 @@ commands = {
 }
 
 
-class goHelpCommand(click.Command):  # Help command information
-    def format_help(self, ctx, formatter):
-        formatter.write_text("Go Command: Open a supported WSU website.")
-        formatter.write_paragraph()
+@click.command(cls=goHelpCommand)
+@click.argument("resource", required=False)
+@click.pass_context
+def go(ctx, resource):
+    # If no argument OR help requested → show custom help
+    if resource is None or resource.lower() == "help":
+        click.echo(ctx.get_help())
+        return
 
-        formatter.write_text("Usage: wb go [RESOURCE]")
-        formatter.write_paragraph()
-
-        formatter.write_text("RESOURCES:")
-        formatter.write_text(
-            "  academica - Opens your browser to the Academica website."
-        )
-        formatter.write_text(
-            "  library  -  Opens your browser to the WSU Library website."
-        )
-        formatter.write_text(
-            "  bookstore - Opens your browser to the WSU Bookstore website."
-        )
-        formatter.write_text("  help or --help - Show this message")
-        formatter.write_paragraph()
-
-        formatter.write_text("Help Menu:")
-        formatter.write_text("  wb help or wb --help")
-
-
-@click.command()
-@click.argument("resource")
-def go(resource):
     resource = resource.lower()
     cmd = commands.get(resource)
+
     if cmd:
         cmd.execute()
     else:
