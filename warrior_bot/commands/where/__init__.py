@@ -12,11 +12,17 @@ from warrior_bot.commands.where.where_facade import WhereFacade
 
 @click.command(cls=whereHelpCommand)
 @click.argument("name", nargs=-1)
-@click.option("--building", "--b", is_flag=True, help="Search for a building address.")
-@click.option("--staff", "--s", is_flag=True, help="Search for a staff member")
 @click.option(
+    "-b",
+    "-building",
+    "--building",
+    is_flag=True,
+    help="Search for a building address.",
+)
+@click.option("-s", "--staff", is_flag=True, help="Search for a staff member")
+@click.option(
+    "-r",
     "--restaurants",
-    "--r",
     is_flag=True,
     help="List all on-campus and nearby restaurants.",
 )
@@ -84,7 +90,9 @@ def where(ctx, name, building, staff, restaurants, campus, awd):
         click.echo(result)
 
     else:
-        click.echo("\033[31mNo Flag used. Type Help for more information\033[0m")
+        click.echo(
+            "\033[31m[ERROR] No Flag used. Type Help for more information\033[0m"
+        )
 
     click.echo(f"Command took {round(time.time() - start_time, 2)} seconds")
 
@@ -139,7 +147,7 @@ def displayStaffInfo(name: str, soup) -> str:
         email = cells[4].get_text(strip=True) if len(cells) > 4 else ""
         profile_path = link.get("href", "") if link else ""
 
-        if not any([title, department, phone, email, profile_path]):
+        if not any([title, department, phone, email]):
             return "[ERROR] No staff info found"
 
         profile_url = f"https://wayne.edu{profile_path}" if profile_path else ""
