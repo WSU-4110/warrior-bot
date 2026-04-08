@@ -25,6 +25,8 @@ class WhereFacade:
         count = len(staff)
 
         if count == 1:
+            if soup is None:
+                return self._staff_formatter.format_not_found(), False
             return self._staff_formatter.format_single(full_name, soup), True
         else:
             return self._staff_formatter.format_multiple(staff, count), True

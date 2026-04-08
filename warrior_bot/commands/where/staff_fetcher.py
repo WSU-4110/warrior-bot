@@ -22,10 +22,11 @@ class StaffFetcher:
             ) from e
 
         soup = BeautifulSoup(response.text, "html.parser")
-        staff = [
-            row.find("td").get_text(strip=True)
-            for row in soup.select("table.table-stack tbody tr")
-        ]
+        staff = []
+        for row in soup.select("table.table-stack tbody tr"):
+            first_cell = row.find("td")
+            if first_cell is not None:
+                staff.append(first_cell.get_text(strip=True))
 
         return staff, soup
 

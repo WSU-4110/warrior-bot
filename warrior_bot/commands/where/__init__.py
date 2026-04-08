@@ -84,7 +84,7 @@ def where(ctx, name, building, staff, restaurants, campus, awd):
         click.echo(result)
 
     else:
-        click.echo(f"\033[31mNo Flag used. Type Help for more information\033[0m")
+        click.echo("\033[31mNo Flag used. Type Help for more information\033[0m")
 
     click.echo(f"Command took {round(time.time() - start_time, 2)} seconds")
 
@@ -110,3 +110,50 @@ def _loading_animation(stop: threading.Event) -> None:
             time.sleep(0.7)
         sys.stdout.write("\b" * 3 + " " * 3 + "\b" * 3)
         sys.stdout.flush()
+
+
+# Backward-compatible exports used by the test suite.
+loadingAnimation = _loading_animation
+stopAnimation = _stop_animation
+
+
+def displayStaffInfo(name: str, soup) -> str:
+    """Format a staff search result row from the legacy HTML table structure."""
+
+    for row in soup.select("table.table-stack tbody tr"):
+        cells = row.find_all("td")
+        if not cells:
+            continue
+
+        link = cells[0].find("a")
+        if link:
+            staff_name = link.get_text(strip=True)
+        else:
+            staff_name = cells[0].get_text(strip=True)
+        if staff_name != name:
+            continue
+
+        title = cells[1].get_text(strip=True) if len(cells) > 1 else ""
+        department = cells[2].get_text(strip=True) if len(cells) > 2 else ""
+        phone = cells[3].get_text(strip=True) if len(cells) > 3 else ""
+        email = cells[4].get_text(strip=True) if len(cells) > 4 else ""
+        profile_path = link.get("href", "") if link else ""
+
+        if not any([title, department, phone, email, profile_path]):
+            return "[ERROR] No staff info found"
+
+        profile_url = f"https://wayne.edu{profile_path}" if profile_path else ""
+        parts = [staff_name]
+        if title:
+            parts.append(title)
+        if department:
+            parts.append(department)
+        if phone:
+            parts.append(phone)
+        if email:
+            parts.append(email)
+        if profile_url:
+            parts.append(profile_url)
+        return "\n".join(parts)
+
+    return "[ERROR] No staff info found"

@@ -13,7 +13,13 @@ class StaffFormatter:
         info = f"{full_name} "
         errors = ""
         row = soup.select_one("table.table-stack tbody tr")
-        cols = row.findAll("td")
+        if row is None:
+            return self.format_not_found()
+
+        cols = row.find_all("td")
+        if len(cols) < 5:
+            return self.format_not_found()
+
         title = cols[1].get_text(strip=True)
         dept = cols[2].get_text(strip=True)
         phone = cols[3].get_text(strip=True)
@@ -49,8 +55,9 @@ class StaffFormatter:
             )
         name_col = cols[0]
         link_tag = name_col.find("a")
-        if link_tag and link_tag.get("href"):
-            link = "https://wayne.edu" + link_tag["href"]
+        href = link_tag.get("href") if link_tag else None
+        if isinstance(href, str) and href:
+            link = "https://wayne.edu" + href
             info += (
                 f"For more information on {full_name},"
                 f" visit their web page: {link}\n"
