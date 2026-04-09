@@ -1,5 +1,5 @@
 """Staff formatter subsystem for the Where Facade."""
-
+import requests
 from bs4 import BeautifulSoup
 
 
@@ -29,7 +29,6 @@ class StaffFormatter:
         if dept:
             info += (
                 f"Department: {self.BOLD}{dept}{self.RESET} department.\n"
-                "You can find them at PLACEHOLDER.\n"
             )
         else:
             errors += (
@@ -58,6 +57,22 @@ class StaffFormatter:
         href = link_tag.get("href") if link_tag else None
         if isinstance(href, str) and href:
             link = "https://wayne.edu" + href
+
+            staff_office_loc = format_office_search(self.BOLD, self.RESET, link)
+            if not staff_office_loc:
+                errors += (
+                    f"{self.RED}[ERROR] No information found on offices.{self.RESET}\n"
+                    f" - For possible office locations, look at their department or instructors syllabus\n"
+                )
+                if email:
+                    errors += (
+                        f" - For more information of office locations, "
+                        f"you can email them at {self.BOLD}{email}{self.RESET}\n"
+                    )
+            else:
+                info += (
+                    f"You may find their {self.BOLD}office{self.RESET} at: \n{staff_office_loc}\n"
+                )
             info += (
                 f"For more information on {full_name},"
                 f" visit their web page: {link}\n"
@@ -66,6 +81,7 @@ class StaffFormatter:
             errors += (
                 self.RED
                 + "[ERROR] This staff member does not have a web page link.\n"
+                + "Office information cannon be found without a registered web page"
                 + self.RESET
             )
         return info + errors
@@ -89,3 +105,58 @@ class StaffFormatter:
             " For building use -building or -b after the name\n"
             " Please try again using wb where"
         )
+
+def format_office_search(BOLD, RESET, link):
+    #html search
+    staff_office_str = ""
+
+    try:
+        response = requests.get(link)
+        response.raise_for_status()
+    except requests.RequestException:
+        return staff_office_str
+
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    building = ""
+    office = ""
+    room = ""
+    address = ""
+
+    for section in soup.findAll("div"):
+
+        text = section.get_text(separator=" ", strip=True)
+
+        lower_text = text.lower()
+
+        #keywords to find office
+        if lower_text.startswith("office:"):
+            office = text.split(":", 1)[1].strip()
+        elif lower_text.startswith("building:"):
+            building = text.split(":", 1)[1].strip()
+        elif lower_text.startswith("room:"):
+            room = text.split(":", 1)[1].strip()
+        elif lower_text.startswith("address:"):
+            address = text.split(":", 1)[1].strip()
+
+
+    if office:
+        staff_office_str += (
+            f"{BOLD}Office:{RESET} {office}\n"
+        )
+    if room:
+        staff_office_str += (
+            f"{BOLD}Room:{RESET} {room}\n"
+        )
+    if building:
+        staff_office_str += (
+            f"{BOLD}Building:{RESET} {building}\n"
+        )
+    if address:
+        staff_office_str += (
+            f"{BOLD}Address:{RESET} {address}\n"
+        )
+
+    return staff_office_str
+
+
