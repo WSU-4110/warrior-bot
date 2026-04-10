@@ -3,6 +3,10 @@
 import sys
 import threading
 import time
+import urllib.parse
+import subprocess
+import platform
+import re
 
 import click
 
@@ -34,8 +38,11 @@ from warrior_bot.commands.where.where_facade import WhereFacade
     is_flag=True,
     help="Show Anthony Wayne Drive restaurants only (use with -r).",
 )
+@click.option(
+    "--email", "--e", is_flag=True, help="Open mail app with professor's email."
+)
 @click.pass_context
-def where(ctx, name, building, staff, restaurants, campus, awd):
+def where(ctx, name, building, staff, restaurants, campus, awd, email):
     """Find buildings, instructors, and restaurants at Wayne State."""
 
     if not name and not restaurants:
@@ -85,10 +92,20 @@ def where(ctx, name, building, staff, restaurants, campus, awd):
         full_name = " ".join(name).title()
         click.echo(f"Finding {full_name}", nl=False)
         stop, animation = _start_animation()
-        result, _ = facade.search_staff(full_name)
+        result, staff_data = facade.search_staff(full_name)
         _stop_animation(stop, animation)
         click.echo(result)
 
+        if email:
+            clean_result = re.sub(r"\x1b\[[0-9;]*m", "", result)
+            match = re.search(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", clean_result)
+            professor_email = match.group(0) if match else None
+
+            if professor_email:
+                click.echo(f"Opening mail app for: {professor_email}")
+                _open_mail(professor_email)
+            else:
+                click.echo(click.style("[ERROR] No email found for this staff member.", fg="red"))
     else:
         click.echo(
             "\033[31m[ERROR] No Flag used. Type Help for more information\033[0m"
@@ -118,6 +135,17 @@ def _loading_animation(stop: threading.Event) -> None:
             time.sleep(0.7)
         sys.stdout.write("\b" * 3 + " " * 3 + "\b" * 3)
         sys.stdout.flush()
+
+def _open_mail(email_address):
+    mailto = f"mailto:{email_address}"
+
+    system = platform.system()
+    if system == "Darwin":
+        subprocess.run(["open", mailto])
+    elif system == "Windows":
+        subprocess.run(["start", mailto], shell=True)
+    else:
+        subprocess.run(["xdg-open", mailto])
 
 
 # Backward-compatible exports used by the test suite.
