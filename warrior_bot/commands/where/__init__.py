@@ -3,7 +3,6 @@
 import sys
 import threading
 import time
-import urllib.parse
 import subprocess
 import platform
 import re
