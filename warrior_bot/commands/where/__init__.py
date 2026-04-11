@@ -16,7 +16,6 @@ from warrior_bot.commands.where.where_facade import WhereFacade
 @click.argument("name", nargs=-1)
 @click.option(
     "-b",
-    "-building",
     "--building",
     is_flag=True,
     help="Search for a building address.",
@@ -35,7 +34,7 @@ from warrior_bot.commands.where.where_facade import WhereFacade
     help="Anthony Wayne Drive only (use with -r).",
 )
 @click.option(
-    "--email", "--e", is_flag=True, help="Open mail app with professor's email."
+    "-e", "--email", is_flag=True, help="Open mail app with professor's email."
 )
 @click.pass_context
 def where(ctx, name, building, staff, restaurants, campus, awd, email):
