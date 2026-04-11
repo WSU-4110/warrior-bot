@@ -1,11 +1,11 @@
 """Where command implementation."""
 
-import platform
-import re
-import subprocess
 import sys
 import threading
 import time
+import subprocess
+import platform
+import re
 
 import click
 
@@ -91,20 +91,14 @@ def where(ctx, name, building, staff, restaurants, campus, awd, email):
 
         if email:
             clean_result = re.sub(r"\x1b\[[0-9;]*m", "", result)
-            match = re.search(
-                r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", clean_result
-            )
+            match = re.search(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", clean_result)
             professor_email = match.group(0) if match else None
 
             if professor_email:
                 click.echo(f"Opening mail app for: {professor_email}")
                 _open_mail(professor_email)
             else:
-                click.echo(
-                    click.style(
-                        "[ERROR] No email found for this staff member.", fg="red"
-                    )
-                )
+                click.echo(click.style("[ERROR] No email found for this staff member.", fg="red"))
     else:
         query = " ".join(name)
         result, found = facade.search_all(query)
