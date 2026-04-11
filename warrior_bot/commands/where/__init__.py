@@ -121,8 +121,11 @@ def where(ctx, name, building, staff, restaurants, campus, awd, email):
                     )
                 )
     else:
-        query = " ".join(name)
+        query = " ".join(name).title()
+        click.echo(f"Finding {query}", nl=False)
+        stop, animation = _start_animation()
         result, found = facade.search_all(query)
+        _stop_animation(stop, animation)
         click.echo(result)
 
         if found and email:
