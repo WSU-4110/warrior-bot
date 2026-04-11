@@ -62,13 +62,25 @@ def where(ctx, name, building, staff, restaurants, campus, awd, email):
     if restaurants:
         if name:
             query = " ".join(name)
+            click.echo(f"Searching for restaurant: {query}", nl=False)
+            stop, animation = _start_animation()
             result, _ = facade.search_restaurants_by_name(query)
+            _stop_animation(stop, animation)
         elif awd:
+            click.echo("Loading Anthony Wayne Drive restaurants...", nl=False)
+            stop, animation = _start_animation()
             result, _ = facade.search_restaurants(category="awd")
+            _stop_animation(stop, animation)
         elif campus:
+            click.echo("Loading on-campus dining locations...", nl=False)
+            stop, animation = _start_animation()
             result, _ = facade.search_restaurants(category="campus")
+            _stop_animation(stop, animation)
         else:
+            click.echo("Loading all restaurants...", nl=False)
+            stop, animation = _start_animation()
             result, _ = facade.search_restaurants(category="all")
+            _stop_animation(stop, animation)
         click.echo(result)
 
     elif building:
@@ -86,7 +98,10 @@ def where(ctx, name, building, staff, restaurants, campus, awd, email):
 
     elif staff:
         full_name = " ".join(name).title()
-        result, _ = facade.search_staff(full_name)
+        click.echo(f"Finding {full_name}", nl=False)
+        stop, animation = _start_animation()
+        result, staff_data = facade.search_staff(full_name)
+        _stop_animation(stop, animation)
         click.echo(result)
 
         if email:
@@ -118,6 +133,13 @@ def where(ctx, name, building, staff, restaurants, campus, awd, email):
     click.echo(f"Command took {round(time.time() - start_time, 2)} seconds")
 
 
+def _start_animation() -> tuple[threading.Event, threading.Thread]:
+    stop = threading.Event()
+    animation = threading.Thread(target=_loading_animation, args=(stop,))
+    animation.start()
+    return stop, animation
+
+
 def _stop_animation(stop: threading.Event, animation: threading.Thread) -> None:
     stop.set()
     animation.join()
@@ -132,7 +154,6 @@ def _loading_animation(stop: threading.Event) -> None:
             time.sleep(0.7)
         sys.stdout.write("\b" * 3 + " " * 3 + "\b" * 3)
         sys.stdout.flush()
-
 
 def _open_mail(email_address):
     mailto = f"mailto:{email_address}"
