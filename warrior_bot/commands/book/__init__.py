@@ -173,24 +173,28 @@ def book(ctx: click.Context, building: tuple[str, ...], headed: bool):
     def search_and_select_room(page) -> None:
         _step("Room Search")
 
-        booking_date = prompts.prompt_date()
-        start_time = prompts.prompt_start_time()
-        end_time = prompts.prompt_end_time()
+        while True:
+            booking_date = prompts.prompt_date()
+            start_time = prompts.prompt_start_time()
+            end_time = prompts.prompt_end_time()
 
-        _info("Filling date and time...")
-        ems_pages.fill_date(page, booking_date)
-        ems_pages.fill_start_time(page, start_time)
-        ems_pages.fill_end_time(page, end_time)
+            _info("Filling date and time...")
+            ems_pages.fill_date(page, booking_date)
+            ems_pages.fill_start_time(page, start_time)
+            ems_pages.fill_end_time(page, end_time)
 
-        _info("Searching for available rooms...")
-        ems_pages.click_search(page)
+            _info("Searching for available rooms...")
+            ems_pages.click_search(page)
 
-        rooms = ems_pages.scrape_rooms(page)
-        if not rooms:
-            _error(
-                "No rooms found for the given criteria. " "Try different dates/times."
-            )
-            sys.exit(1)
+            rooms = ems_pages.scrape_rooms(page)
+            if rooms:
+                break
+
+            _error("No rooms found for the given criteria.")
+            if not prompts.prompt_confirm("Try different dates/times?"):
+                _info("Exiting.")
+                sys.exit(0)
+            _step("Room Search (retry)")
 
         _info(f"Found {len(rooms)} room(s).")
         selected_room = prompts.prompt_room(rooms)
