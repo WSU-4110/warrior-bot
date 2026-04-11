@@ -4,7 +4,6 @@ import click
 from colorama import Fore, Style
 
 from warrior_bot.commands import book, go, help, where
-from warrior_bot.commands.help import mainHelp
 
 BANNER = (
     Fore.GREEN
@@ -23,7 +22,7 @@ BANNER = (
 class BannerGroup(click.Group):
     def format_help(self, ctx, formatter):
         click.echo(BANNER)
-        mainHelp(formatter)
+        super().format_help(ctx, formatter)
 
 
 @click.group(cls=BannerGroup)

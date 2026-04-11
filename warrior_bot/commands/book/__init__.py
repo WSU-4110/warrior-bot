@@ -9,8 +9,6 @@ import sys
 import click
 from colorama import Fore, Style
 
-from warrior_bot.commands.help import bookHelpCommand, showHelp
-
 STEP_COLOR = Fore.GREEN
 ERR_COLOR = Fore.RED
 INFO_COLOR = Fore.YELLOW
@@ -28,15 +26,24 @@ def _error(msg: str) -> None:
     click.echo(f"{ERR_COLOR}   {msg}{Style.RESET_ALL}")
 
 
-@click.command(cls=bookHelpCommand)
+@click.command()
 @click.argument("building", nargs=-1)
 @click.option("--headed", is_flag=True, help="Show the browser window for debugging.")
 @click.pass_context
 def book(ctx: click.Context, building: tuple[str, ...], headed: bool):
+    """Reserve rooms on EMS.
+
+    \b
+    BUILDINGS:
+      state hall    - Reserve a room in State Hall
+      stem          - Reserve a room in STEM
+      lounge space  - Reserve a lounge space room
+    """
     value = " ".join(building) if building else None
 
     if value == "help":
-        showHelp(ctx, value)
+        click.echo(ctx.get_help())
+        ctx.exit()
     try:
         from playwright.sync_api import TimeoutError as PwTimeout
         from playwright.sync_api import sync_playwright

@@ -74,6 +74,20 @@ def test_Degreeworks(mockBrowser):
     assert autoraise is True
 
 
+def test_Degreeworks_multiword(mockBrowser):
+    """Resource names can span multiple tokens (e.g. 'degree works' -> degreeworks)."""
+    runner = CliRunner()
+
+    result = runner.invoke(go_command, ["degree", "works"])
+
+    assert result.exit_code == 0
+    assert "Executing go command" in result.output
+    url, new, autoraise = mockBrowser[0]
+    assert url == "https://degreeworks.wayne.edu/"
+    assert new == 1
+    assert autoraise is True
+
+
 # 5. Invalid Command Unit Test
 def test_InvalidCommand(mockBrowser):
     runner = CliRunner()
@@ -92,3 +106,24 @@ def test_ExecMsg(mockBrowser):
     result = runner.invoke(go_command, ["academica"])
 
     assert "Executing go command" in result.output
+
+
+# 7. Help Unit Test
+def test_Help():
+    runner = CliRunner()
+
+    result = runner.invoke(go_command, ["help"])
+
+    assert result.exit_code == 0
+    assert "RESOURCES" in result.output
+    assert "academica" in result.output
+
+
+# 8. No arguments shows help
+def test_NoArgs():
+    runner = CliRunner()
+
+    result = runner.invoke(go_command, [])
+
+    assert result.exit_code == 0
+    assert "RESOURCES" in result.output

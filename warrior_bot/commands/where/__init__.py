@@ -9,11 +9,10 @@ import time
 
 import click
 
-from warrior_bot.commands.help import whereHelpCommand
 from warrior_bot.commands.where.where_facade import WhereFacade
 
 
-@click.command(cls=whereHelpCommand)
+@click.command()
 @click.argument("name", nargs=-1)
 @click.option(
     "-b",
@@ -22,28 +21,33 @@ from warrior_bot.commands.where.where_facade import WhereFacade
     is_flag=True,
     help="Search for a building address.",
 )
-@click.option("-s", "--staff", is_flag=True, help="Search for a staff member")
+@click.option("-s", "--staff", is_flag=True, help="Search for a staff member.")
 @click.option(
     "-r",
     "--restaurants",
     is_flag=True,
     help="List all on-campus and nearby restaurants.",
 )
-@click.option(
-    "--campus", is_flag=True, help="Show on-campus dining locations only (use with -r)."
-)
+@click.option("--campus", is_flag=True, help="On-campus dining only (use with -r).")
 @click.option(
     "--awd",
     is_flag=True,
-    help="Show Anthony Wayne Drive restaurants only (use with -r).",
+    help="Anthony Wayne Drive only (use with -r).",
 )
 @click.option(
     "--email", "--e", is_flag=True, help="Open mail app with professor's email."
 )
 @click.pass_context
 def where(ctx, name, building, staff, restaurants, campus, awd, email):
-    """Find buildings, instructors, and restaurants at Wayne State."""
+    """Find buildings, staff, and restaurants at Wayne State.
 
+    \b
+    EXAMPLES:
+      wb where -s John Doe      Search for staff member
+      wb where -b State Hall    Search for a building
+      wb where -r               List all restaurants
+      wb where -r --campus      On-campus dining only
+    """
     if not name and not restaurants:
         click.echo(ctx.get_help())
         ctx.exit()
