@@ -121,10 +121,10 @@ def where(ctx, name, building, staff, restaurants, campus, awd, email):
                     )
                 )
     else:
-        query = " ".join(name).title()
-        click.echo(f"Finding {query}", nl=False)
+        full_name = " ".join(name).title()
+        click.echo(f"Finding {full_name}", nl=False)
         stop, animation = _start_animation()
-        result, found = facade.search_all(query)
+        result, found = facade.search_all(full_name)
         _stop_animation(stop, animation)
         click.echo(result)
 
