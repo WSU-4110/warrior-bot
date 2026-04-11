@@ -1,37 +1,43 @@
-# Commands Overview
+# warrior-bot
 
-warrior-bot provides three main commands to help you access WSU resources quickly.
+<img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Wayne_State_Warriors_primary_logo.svg" width="128" height="128"/>
 
-## Available Commands
+## Welcome!
 
-### `go`
+warrior-bot is a CLI tool for Wayne State University staff and students. The idea is to make many of the things we need day to day easier to access and use through the terminal.
 
-Navigate to WSU resources and websites.
+## Quick Start
 
-[Learn more →](go.md)
-
-### `where`
-
-Find buildings, staff, and restaurants at Wayne State University.
-
-[Learn more →](where.md)
-
-### `book`
-
-Reserve spaces and facilities at WSU.
-
-[Learn more →](book.md)
-
-## Usage Pattern
-
-All commands follow a consistent pattern:
-
+Install warrior-bot via `pip`, `uv` or `poetry`:
 ```bash
-wb <command> [options] [arguments]
+pip install warrior-bot
+uv install warrior-bot
+poetry install warrior-bot
 ```
 
-Use `--help` with any command to see available options:
+Use the CLI:
 
+"wb" is a shorthand alias for "warrior-bot"
 ```bash
-wb <command> --help
+# Find a staff member
+wb where -s Naresh Mahabir
+
+# Find a building
+wb where -b State Hall
+
+# Navigate to resources
+wb go degree works
+
+# Book a room
+wb book state hall
 ```
+
+## Next Steps
+
+- [Installation Guide](getting-started/installation.md)
+- [Quick Start Tutorial](getting-started/quick-start.md)
+- [Command Reference](commands/index.md)
+
+## License
+
+This project is dual-licensed under MIT or Apache 2.0 - choose whichever works best for you.
