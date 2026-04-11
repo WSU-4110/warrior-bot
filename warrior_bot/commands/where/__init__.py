@@ -71,12 +71,17 @@ def where(ctx, name, building, staff, restaurants, campus, awd, email):
         click.echo(result)
 
     elif building:
-        url = "https://maps.wayne.edu/all/"
-        click.echo(
-            "Flagged as Building...\n"
-            "This Feature is currently non-functional.\n"
-            f"For building information go to {url}"
-        )
+        query = " ".join(name)
+        if not query:
+            click.echo(
+                click.style(
+                    "[ERROR] Provide a building name. e.g. wb where -b State Hall",
+                    fg="red",
+                )
+            )
+            ctx.exit()
+        result, _ = facade.search_building(query)
+        click.echo(result)
 
     elif staff:
         full_name = " ".join(name).title()

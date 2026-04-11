@@ -1,5 +1,6 @@
 """Facade for the Where command."""
 
+from warrior_bot.commands.where.building_fetcher import BuildingFetcher
 from warrior_bot.commands.where.restaurant_fetcher import RestaurantFetcher
 from warrior_bot.commands.where.staff_fetcher import StaffFetcher, StaffFetchError
 from warrior_bot.commands.where.staff_formatter import StaffFormatter
@@ -11,6 +12,7 @@ class WhereFacade:
         self._staff_fetcher = StaffFetcher()
         self._staff_formatter = StaffFormatter()
         self._restaurant_fetcher = RestaurantFetcher()
+        self._building_fetcher = BuildingFetcher()
 
     def search_staff(self, name: str) -> tuple[str, bool]:
         try:
@@ -59,6 +61,36 @@ class WhereFacade:
 
         header = f"Search results for '{query}'"
         return self._format_restaurant_list(header, results), True
+
+    def search_building(self, query: str) -> tuple[str, bool]:
+        results = self._building_fetcher.search(query)
+
+        if not results:
+            return (
+                f"\033[31m[ERROR] No building matching '{query}' found.\033[0m\n"
+                " Try 'wb where -b' with a different name or building code.",
+                False,
+            )
+
+        return self._format_building_list(results), True
+
+    def _format_building_list(self, buildings: list[dict]) -> str:
+        BOLD = "\033[1m"
+        RESET = "\033[0m"
+        DIM = "\033[2m"
+
+        lines = [f"\n{BOLD}Building Search Results{RESET} ({len(buildings)} found)\n"]
+        lines.append("-" * 40)
+
+        for b in buildings:
+            lines.append(f"{BOLD}{b['name']}{RESET} ({b.get('code', '')})")
+            lines.append(f"  Address : {b['address']}")
+            lines.append(f"  Type    : {b.get('type', '')}")
+            if b.get("description"):
+                lines.append(f"  {DIM}{b['description']}{RESET}")
+            lines.append("")
+
+        return "\n".join(lines)
 
     def _format_restaurant_list(self, header: str, restaurants: list[dict]) -> str:
         BOLD = "\033[1m"
