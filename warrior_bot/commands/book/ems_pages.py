@@ -384,23 +384,28 @@ def scrape_rooms(page: Page) -> list[dict[str, Any]]:
 
     for i in range(count):
         row = rows.nth(i)
-        cells = row.locator("td")
-        if cells.count() < 2:
+        row_class = row.get_attribute("class") or ""
+        if "header" in row_class:
             continue
-        room_name = cells.nth(1).inner_text().strip() if cells.count() > 1 else ""
+
+        link = row.locator("a:not(.add-to-cart)").first
+        try:
+            room_name = link.inner_text(timeout=2_000).strip()
+        except Exception:
+            continue
         if not room_name:
             continue
-        location = cells.nth(2).inner_text().strip() if cells.count() > 2 else ""
-        floor = cells.nth(3).inner_text().strip() if cells.count() > 3 else ""
-        capacity = cells.nth(5).inner_text().strip() if cells.count() > 5 else ""
 
         display = room_name
-        if location:
-            display += f" | {location}"
-        if floor:
-            display += f" | {floor}"
-        if capacity:
-            display += f" | Cap: {capacity}"
+
+        try:
+            cap_cell = row.locator('td[data-bind*="Capacity"]')
+            if cap_cell.count() > 0:
+                cap = cap_cell.first.inner_text(timeout=1_000).strip()
+                if cap:
+                    display += f" | Cap: {cap}"
+        except Exception:
+            pass
 
         rooms.append({"name": display, "row_index": i})
 
