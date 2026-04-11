@@ -1,0 +1,302 @@
+{
+    "campus": "Wayne State University",
+    "location": "Detroit, Michigan",
+    "categories": {
+      "academic": [
+        {
+          "name": "Art Building",
+          "code": "ART",
+          "address": "5400 Gullen Mall, Detroit, MI 48202",
+          "type": "Academic",
+          "description": "Houses art programs and studios"
+        },
+        {
+          "name": "Biological Sciences Building",
+          "code": "BIO",
+          "address": "5047 Gullen Mall, Detroit, MI 48202",
+          "type": "Academic",
+          "description": "Biology research and classrooms"
+        },
+        {
+          "name": "Chemistry Building",
+          "code": "CHEM",
+          "address": "5101 Cass Ave, Detroit, MI 48202",
+          "type": "Academic",
+          "description": "Chemistry labs and lecture halls"
+        },
+        {
+          "name": "James and Patricia Anderson College of Engineering",
+          "code": "ENGG",
+          "address": "5050 Anthony Wayne Dr, Detroit, MI 48202",
+          "type": "Academic",
+          "description": "Engineering programs and labs"
+        },
+        {
+          "name": "General Lectures Building",
+          "code": "LECT",
+          "address": "5045 Anthony Wayne Dr, Detroit, MI 48202",
+          "type": "Academic",
+          "description": "Large lecture halls and classrooms"
+        },
+        {
+          "name": "Life Sciences Building",
+          "code": "LIFE",
+          "address": "5047 Gullen Mall, Detroit, MI 48202",
+          "type": "Academic",
+          "description": "Life sciences research and education"
+        },
+        {
+          "name": "Physics Building",
+          "code": "PHY",
+          "address": "666 W. Hancock Ave, Detroit, MI 48202",
+          "type": "Academic",
+          "description": "Physics department and research facilities"
+        },
+        {
+          "name": "Science Hall",
+          "code": "SCI",
+          "address": "5045 Cass Ave, Detroit, MI 48202",
+          "type": "Academic",
+          "description": "General science programs"
+        },
+        {
+          "name": "STEM Innovation Learning Center",
+          "code": "SILC",
+          "address": "5048 Gullen Mall, Detroit, MI 48202",
+          "type": "Academic",
+          "description": "Modern STEM education and collaboration space"
+        },
+        {
+          "name": "Mike Ilitch School of Business",
+          "code": "MIKE",
+          "address": "2771 Woodward Ave, Detroit, MI 48201",
+          "type": "Academic",
+          "description": "Business school programs and facilities"
+        },
+        {
+          "name": "Integrative Biosciences Center",
+          "code": "IBC",
+          "address": "6135 Woodward Ave, Detroit, MI 48202",
+          "type": "Academic",
+          "description": "Advanced biosciences research facility"
+        }
+      ],
+      "libraries": [
+        {
+          "name": "Purdy/Kresge Library",
+          "code": "PURD",
+          "address": "5265 Cass Ave, Detroit, MI 48202",
+          "type": "Library",
+          "description": "Main university library"
+        },
+        {
+          "name": "David Adamany Undergraduate Library",
+          "code": "UGLB",
+          "address": "5155 Gullen Mall, Detroit, MI 48202",
+          "type": "Library",
+          "description": "Undergraduate focused library and study space",
+          "details": {
+            "description": "Undergraduate Library, across from Student Center and STEM center",
+            "study spaces": "Multiple levels with reservable rooms"
+          }
+        },
+        {
+          "name": "Walter P. Reuther Library",
+          "code": "REU",
+          "address": "5401 Cass Ave, Detroit, MI 48202",
+          "type": "Library",
+          "description": "Archives of labor and urban affairs"
+        },
+        {
+          "name": "Arthur Neef Law Library",
+          "code": "LAWL",
+          "address": "471 Gilmour Mall, Detroit, MI 48202",
+          "type": "Library",
+          "description": "Law school library and research center"
+        }
+      ],
+      "administrative": [
+        {
+          "name": "Academic/Administrative Building",
+          "code": "AAB",
+          "address": "5700 Cass Ave, Detroit, MI 48202",
+          "type": "Administrative",
+          "description": "Central administrative offices"
+        },
+        {
+          "name": "Faculty/Administration Building",
+          "code": "FAB",
+          "address": "656 W. Kirby St, Detroit, MI 48202",
+          "type": "Administrative",
+          "description": "Faculty offices and administrative services"
+        },
+        {
+          "name": "Old Main",
+          "code": "MAIN",
+          "address": "4841 Cass Ave, Detroit, MI 48202",
+          "type": "Administrative",
+          "description": "Historic main administration building"
+        },
+        {
+          "name": "Welcome Center",
+          "code": "WLCM",
+          "address": "42 W. Warren Ave, Detroit, MI 48201",
+          "type": "Administrative",
+          "description": "Campus visitor and admissions center"
+        }
+      ],
+      "residential": [
+        {
+          "name": "Anthony Wayne Drive Apartments",
+          "code": "AWDA",
+          "address": "5235 Anthony Wayne Dr, Detroit, MI 48202",
+          "type": "Housing",
+          "description": "Student apartment housing"
+        },
+        {
+          "name": "Chatsworth Suites",
+          "code": "CHAT",
+          "address": "630 Williams Mall, Detroit, MI 48202",
+          "type": "Housing",
+          "description": "Suite-style student housing"
+        },
+        {
+          "name": "Leon H. Atchison Residence Hall",
+          "code": "ATCH",
+          "address": "5110 Anthony Wayne Dr, Detroit, MI 48202",
+          "type": "Housing",
+          "description": "Traditional residence hall"
+        },
+        {
+          "name": "Mackenzie House",
+          "code": "MACK",
+          "address": "510 W. Forest Ave, Detroit, MI 48202",
+          "type": "Housing",
+          "description": "Student residence"
+        },
+        {
+          "name": "Towers Residential Suites",
+          "code": "TWRS",
+          "address": "655 W. Kirby St, Detroit, MI 48202",
+          "type": "Housing",
+          "description": "High-rise suite housing"
+        },
+        {
+          "name": "University Tower",
+          "code": "UTWR",
+          "address": "4500 Cass Ave, Detroit, MI 48201",
+          "type": "Housing",
+          "description": "Apartment-style housing"
+        },
+        {
+          "name": "Yousif B. Ghafari Hall",
+          "code": "GHAF",
+          "address": "695 Williams Mall, Detroit, MI 48202",
+          "type": "Housing",
+          "description": "Modern residence hall"
+        }
+      ],
+      "athletics": [
+        {
+          "name": "Matthaei Physical Education Center",
+          "code": "MATT",
+          "address": "5101 John C. Lodge Service Dr, Detroit, MI 48202",
+          "type": "Athletics",
+          "description": "Physical education and athletics facility"
+        },
+        {
+          "name": "Mort Harris Recreation and Fitness Center",
+          "code": "HRFC",
+          "address": "5210 Gullen Mall, Detroit, MI 48202",
+          "type": "Athletics",
+          "description": "Student recreation and fitness center",
+          "details": {
+            "fitness center": "Behind the Student Center, includes pool and gym"
+          }
+        },
+        {
+          "name": "Tom Adams Field",
+          "code": "STAD",
+          "address": "1401 Edsel Ford Service Dr, Detroit, MI 48202",
+          "type": "Athletics",
+          "description": "Football stadium and track"
+        },
+        {
+          "name": "Wayne State Fieldhouse",
+          "code": "FLDH",
+          "address": "1290 W. Warren Ave, Detroit, MI 48202",
+          "type": "Athletics",
+          "description": "Indoor athletics facility"
+        },
+        {
+          "name": "Softball Stadium",
+          "code": "SOFT",
+          "address": "5190 Trumbull Ave, Detroit, MI 48208",
+          "type": "Athletics",
+          "description": "Softball field and facilities"
+        }
+      ],
+      "student_services": [
+        {
+          "name": "Student Center Building",
+          "code": "SCB",
+          "address": "5221 Gullen Mall, Detroit, MI 48202",
+          "type": "Student Services",
+          "description": "Student organizations, dining, and activities hub",
+          "details": {
+            "food": {
+              "panda express": "Student Center, lower level near Starbucks",
+              "taco bell": "Student Center, lower level near Panda Express",
+              "starbucks": "Student Center, walk all the way to the back when entering through front entrance",
+              "subway": "Student Center, walk all the way to the back and exit out back doors, turn left out those doors"
+            },
+            "midtown market": "Student Center, first floor, walk straight ahead after entering front doors"
+          }
+        },
+        {
+          "name": "University Health Center",
+          "code": "UHC",
+          "address": "4201 St. Antoine St, Detroit, MI 48201",
+          "type": "Student Services",
+          "description": "Student health and wellness services"
+        }
+      ],
+      "law_school": [
+        {
+          "name": "Law School Building",
+          "code": "LAW",
+          "address": "471 W. Palmer St, Detroit, MI 48202",
+          "type": "Professional",
+          "description": "Main law school building"
+        },
+        {
+          "name": "Law Classroom Building",
+          "code": "LAWC",
+          "address": "468 Ferry Mall, Detroit, MI 48202",
+          "type": "Professional",
+          "description": "Law school classrooms"
+        },
+        {
+          "name": "Arthur Neef Law Library",
+          "code": "LAWL",
+          "address": "474 Ferry Mall, Detroit, MI 48202",
+          "type": "Professional",
+          "description": "Law library"
+        }
+      ]
+    },
+    "landmarks": [
+      { "name": "Gullen Mall", "description": "Central pedestrian mall and gathering space" },
+      { "name": "Williams Mall", "description": "Pedestrian walkway through campus" },
+      { "name": "Ferry Mall", "description": "Law school area pedestrian mall" },
+      { "name": "Woodward Avenue", "description": "Major street bordering east side of campus" },
+      { "name": "Cass Avenue", "description": "Major street running through central campus" },
+      { "name": "Anthony Wayne Drive", "description": "Main thoroughfare on west side of campus" }
+    ],
+    "contact": {
+      "main_phone": "(313) 577-2424",
+      "address": "42 W. Warren Ave, Detroit, MI 48202",
+      "website": "https://wayne.edu",
+      "campus_map": "https://maps.wayne.edu"
+    }
+  }

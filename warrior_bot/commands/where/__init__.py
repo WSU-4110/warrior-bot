@@ -42,6 +42,7 @@ def where(ctx, name, building, staff, restaurants, campus, awd, email):
 
     \b
     EXAMPLES:
+      wb where Panda Express    Search across everything
       wb where -s John Doe      Search for staff member
       wb where -b State Hall    Search for a building
       wb where -r               List all restaurants
@@ -71,12 +72,17 @@ def where(ctx, name, building, staff, restaurants, campus, awd, email):
         click.echo(result)
 
     elif building:
-        url = "https://maps.wayne.edu/all/"
-        click.echo(
-            "Flagged as Building...\n"
-            "This Feature is currently non-functional.\n"
-            f"For building information go to {url}"
-        )
+        query = " ".join(name)
+        if not query:
+            click.echo(
+                click.style(
+                    "[ERROR] Provide a building name. e.g. wb where -b State Hall",
+                    fg="red",
+                )
+            )
+            ctx.exit()
+        result, _ = facade.search_building(query)
+        click.echo(result)
 
     elif staff:
         full_name = " ".join(name).title()
@@ -100,9 +106,9 @@ def where(ctx, name, building, staff, restaurants, campus, awd, email):
                     )
                 )
     else:
-        click.echo(
-            "\033[31m[ERROR] No Flag used. Type Help for more information\033[0m"
-        )
+        query = " ".join(name)
+        result, _ = facade.search_all(query)
+        click.echo(result)
 
     click.echo(f"Command took {round(time.time() - start_time, 2)} seconds")
 
