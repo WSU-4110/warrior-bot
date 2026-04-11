@@ -1,38 +1,47 @@
 # where command
 
-Find people, places, or information about WSU locations.
+Find buildings, staff, and restaurants at Wayne State University.
 
 ## Usage
-
 ```bash
 wb where <query>
+wb where [OPTIONS] <query>
 ```
 
+## Options
+
+| Flag | Long Form | Description |
+|------|-----------|-------------|
+| `-b` | `--building` | Search for a building address |
+| `-s` | `--staff` | Search for a staff or faculty member |
+| `-r` | `--restaurants` | List on-campus and nearby restaurants |
+| `-e` | `--email` | Open your mail app with the staff member's email (use with `-s`) |
+| | `--campus` | On-campus dining only (use with `-r`) |
+| | `--awd` | Anthony Wayne Drive restaurants only (use with `-r`) |
+
 ## Examples
-
 ```bash
-# Find a person
-wb where naresh mahabir
+# Find a staff or faculty member
+wb where -s Naresh Mahabir
 
-# Find a building
-wb where state hall
+# Find a building address
+wb where -b State Hall
 
-# Find a department
-wb where computer science
+# List all restaurants (23 locations)
+wb where -r
+
+# On-campus dining only
+wb where -r --campus
+
+# Anthony Wayne Drive restaurants only
+wb where -r --awd
+
+# Open mail app for a staff member
+wb where -s Naresh Mahabir -e
 ```
 
 ## Search Types
 
-The `where` command can help you find:
-
-- **People**: Faculty, staff, and students
-- **Places**: Buildings, rooms, and facilities
-- **Departments**: Academic and administrative units
-
-## Options
-
-Use `--help` to see all available options:
-
-```bash
-wb where --help
-```
+- **Staff/Faculty**: Returns name, title, department, email, office location, and profile link
+- **Buildings**: Returns the address and type of a WSU campus building (supports fuzzy matching)
+- **Restaurants**: Lists dining options with address, phone, type, and description
