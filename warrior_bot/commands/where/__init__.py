@@ -107,8 +107,19 @@ def where(ctx, name, building, staff, restaurants, campus, awd, email):
                 )
     else:
         query = " ".join(name)
-        result, _ = facade.search_all(query)
+        result, found = facade.search_all(query)
         click.echo(result)
+
+        if found and email:
+            clean_result = re.sub(r"\x1b\[[0-9;]*m", "", result)
+            match = re.search(
+                r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", clean_result
+            )
+            professor_email = match.group(0) if match else None
+
+            if professor_email:
+                click.echo(f"Opening mail app for: {professor_email}")
+                _open_mail(professor_email)
 
     click.echo(f"Command took {round(time.time() - start_time, 2)} seconds")
 
