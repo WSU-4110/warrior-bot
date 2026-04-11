@@ -12,7 +12,7 @@ Navigate to WSU resources and websites.
 
 ### `where`
 
-Find people, places, or information about WSU locations.
+Find buildings, staff, and restaurants at Wayne State University.
 
 [Learn more →](where.md)
 
