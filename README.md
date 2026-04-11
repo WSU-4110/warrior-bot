@@ -7,7 +7,21 @@ access and use through the terminal.
 
 You can access the documentation [here](wsu-4110.github.io/warrior-bot/).
 
-Otherwise, some quick setup steps can be found below.
+To install warrior bot, you can run:
+```bash
+pip install warrior-bot
+```
+
+For uv users:
+```bash
+uv install warrior-bot
+```
+For poetry users:
+```bash
+poetry install warrior-bot
+```
+
+**For developers**, you will find relevant info about how to setup, build and run this project below.
 
 ## Requirements
 - Python 3.10+
