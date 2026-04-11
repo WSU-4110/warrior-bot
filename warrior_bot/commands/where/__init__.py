@@ -67,17 +67,17 @@ def where(ctx, name, building, staff, restaurants, campus, awd, email):
             result, _ = facade.search_restaurants_by_name(query)
             _stop_animation(stop, animation)
         elif awd:
-            click.echo("Loading Anthony Wayne Drive restaurants...", nl=False)
+            click.echo("Loading Anthony Wayne Drive restaurants", nl=False)
             stop, animation = _start_animation()
             result, _ = facade.search_restaurants(category="awd")
             _stop_animation(stop, animation)
         elif campus:
-            click.echo("Loading on-campus dining locations...", nl=False)
+            click.echo("Loading on-campus dining locations", nl=False)
             stop, animation = _start_animation()
             result, _ = facade.search_restaurants(category="campus")
             _stop_animation(stop, animation)
         else:
-            click.echo("Loading all restaurants...", nl=False)
+            click.echo("Loading all restaurants", nl=False)
             stop, animation = _start_animation()
             result, _ = facade.search_restaurants(category="all")
             _stop_animation(stop, animation)
