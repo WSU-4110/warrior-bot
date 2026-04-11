@@ -3,32 +3,37 @@
 Navigate to WSU resources and websites quickly.
 
 ## Usage
-
 ```bash
 wb go <destination>
 ```
 
 ## Examples
-
 ```bash
 # Access degree tracking
-wb go degree works
+wb go degreeworks
 
-# Open student registration services
-wb go register
+# Open the WSU library
+wb go library
 
-# View class schedule
-wb go schedule
+# Open the WSU bookstore
+wb go bookstore
+
+# Open WSU Academica
+wb go academica
 ```
 
 ## Available Destinations
 
-Coming soon - this command is currently in development.
+| Destination | Description |
+|-------------|-------------|
+| `degreeworks` | Degree Works (also accepts "degree works") |
+| `library` | WSU Library |
+| `bookstore` | WSU Bookstore |
+| `academica` | WSU Academica |
 
 ## Options
 
 Use `--help` to see all available options:
-
 ```bash
 wb go --help
 ```

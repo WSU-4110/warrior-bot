@@ -1,43 +1,42 @@
 # book command
 
-Reserve spaces and facilities at Wayne State University.
+Reserve rooms and spaces at Wayne State University through EMS.
 
 ## Usage
-
 ```bash
-wb book [options]
+wb book <building>
 ```
 
 ## Examples
-
 ```bash
 # Book a room in State Hall
-wb book --b state hall
+wb book state hall
 
-# Book a study room
-wb book --room study
+# Book a room in STEM
+wb book stem
 
-# View available spaces
-wb book --list
+# Book a lounge space
+wb book lounge space
+
+# Debug mode (shows browser window)
+wb book state hall --headed
 ```
+
+## Available Buildings
+
+| Building | Description |
+|----------|-------------|
+| `state hall` | Reserve a room in State Hall |
+| `stem` | Reserve a room in STEM |
+| `lounge space` | Reserve a lounge space room |
 
 ## Options
 
-- `--b, --building`: Specify the building name
-- `--room`: Specify room type or number
-- `--list`: List available spaces
+| Flag | Description |
+|------|-------------|
+| `--headed` | Show the browser window for debugging |
 
 Use `--help` to see all available options:
-
 ```bash
 wb book --help
 ```
-
-## Bookable Resources
-
-Common resources you can book:
-
-- Study rooms
-- Computer labs
-- Meeting spaces
-- Conference rooms

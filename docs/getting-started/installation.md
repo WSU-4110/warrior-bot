@@ -20,7 +20,7 @@ pip install warrior-bot
 Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/warrior-bot.git
+git clone https://github.com/WSU-4110/warrior-bot.git
 cd warrior-bot
 ```
 

@@ -6,25 +6,41 @@ warrior-bot is designed with a modular architecture that makes it easy to add ne
 > This document was generated using Claude Opus 4.5, and finely edited by a human.
 
 ## Project Structure
-
 ```
 warrior-bot/
 ├── warrior_bot/           # Main package
 │   ├── __init__.py       # Package initialization
 │   ├── __main__.py       # Entry point for python -m
 │   ├── cli.py            # CLI setup and command registration
+│   ├── data/             # Shared data files
+│   │   └── restaurants.json
 │   └── commands/         # All commands
 │       ├── go/
 │       │   └── __init__.py
 │       ├── where/
-│       │   └── __init__.py
+│       │   ├── __init__.py
+│       │   ├── where_facade.py
+│       │   ├── building_fetcher.py
+│       │   ├── staff_fetcher.py
+│       │   ├── staff_formatter.py
+│       │   ├── restaurant_fetcher.py
+│       │   └── data/
+│       │       └── locations.json
 │       └── book/
-│           └── __init__.py
+│           ├── __init__.py
+│           ├── ems_pages.py
+│           └── prompts.py
 ├── docs/                 # Documentation
-├── tests/               # Tests (coming soon)
-├── setup.py            # Package setup
-├── mkdocs.yml          # Documentation config
-└── requirements.txt    # Dependencies
+├── tests/                # Test suite
+│   ├── conftest.py
+│   ├── test_cli.py
+│   ├── test_go.py
+│   ├── test_help.py
+│   ├── test_where.py
+│   └── test_book.py
+├── setup.py              # Package setup
+├── mkdocs.yml            # Documentation config
+└── requirements.txt      # Dependencies
 ```
 
 ## Command Architecture
@@ -38,7 +54,6 @@ Each command lives in its own folder under `warrior_bot/commands/`. This provide
 ### Command Structure
 
 Each command is a Click command function:
-
 ```python
 import click
 
@@ -53,7 +68,6 @@ def mycommand(flag, arg):
 ### Command Registration
 
 Commands are registered in `cli.py`:
-
 ```python
 import click
 from warrior_bot.commands import go, where, book
