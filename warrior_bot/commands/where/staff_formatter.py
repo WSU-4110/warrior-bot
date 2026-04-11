@@ -1,4 +1,5 @@
 """Staff formatter subsystem for the Where Facade."""
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -27,9 +28,7 @@ class StaffFormatter:
         if title:
             info += f"- {title}\n"
         if dept:
-            info += (
-                f"Department: {self.BOLD}{dept}{self.RESET} department.\n"
-            )
+            info += f"Department: {self.BOLD}{dept}{self.RESET} department.\n"
         else:
             errors += (
                 self.RED
@@ -62,7 +61,8 @@ class StaffFormatter:
             if not staff_office_loc:
                 errors += (
                     f"{self.RED}[ERROR] No information found on offices.{self.RESET}\n"
-                    f" - For possible office locations, look at their department or instructors syllabus\n"
+                    f" - For possible office locations, look at their "
+                    f"department or instructors syllabus\n"
                 )
                 if email:
                     errors += (
@@ -71,7 +71,8 @@ class StaffFormatter:
                     )
             else:
                 info += (
-                    f"You may find their {self.BOLD}office{self.RESET} at: \n{staff_office_loc}\n"
+                    f"You may find their {self.BOLD}office{self.RESET} at: \n"
+                    f"{staff_office_loc}\n"
                 )
             info += (
                 f"For more information on {full_name},"
@@ -106,8 +107,9 @@ class StaffFormatter:
             " Please try again using wb where"
         )
 
+
 def format_office_search(BOLD, RESET, link):
-    #html search
+    # html search
     staff_office_str = ""
 
     try:
@@ -129,7 +131,7 @@ def format_office_search(BOLD, RESET, link):
 
         lower_text = text.lower()
 
-        #keywords to find office
+        # keywords to find office
         if lower_text.startswith("office:"):
             office = text.split(":", 1)[1].strip()
         elif lower_text.startswith("building:"):
@@ -139,24 +141,13 @@ def format_office_search(BOLD, RESET, link):
         elif lower_text.startswith("address:"):
             address = text.split(":", 1)[1].strip()
 
-
     if office:
-        staff_office_str += (
-            f"{BOLD}Office:{RESET} {office}\n"
-        )
+        staff_office_str += f"{BOLD}Office:{RESET} {office}\n"
     if room:
-        staff_office_str += (
-            f"{BOLD}Room:{RESET} {room}\n"
-        )
+        staff_office_str += f"{BOLD}Room:{RESET} {room}\n"
     if building:
-        staff_office_str += (
-            f"{BOLD}Building:{RESET} {building}\n"
-        )
+        staff_office_str += f"{BOLD}Building:{RESET} {building}\n"
     if address:
-        staff_office_str += (
-            f"{BOLD}Address:{RESET} {address}\n"
-        )
+        staff_office_str += f"{BOLD}Address:{RESET} {address}\n"
 
     return staff_office_str
-
-
