@@ -337,7 +337,25 @@ def book(ctx: click.Context, building: tuple[str, ...], headed: bool):
         except Exception:
             pass
 
-    def _focus_terminal() -> None:
+    def _get_linux_terminal_window_id() -> str | None:
+        """Get the current active window ID on Linux before browser launches."""
+        if sys.platform == "darwin":
+            return None
+        try:
+            result = subprocess.run(
+                ["xdotool", "getactivewindow"],
+                capture_output=True,
+                text=True,
+                timeout=3,
+            )
+            window_id = result.stdout.strip()
+            if window_id:
+                return window_id
+        except Exception:
+            pass
+        return None
+
+    def _focus_terminal(saved_window_id: str | None = None) -> None:
         """Bring the owning terminal back to the foreground."""
         if sys.platform == "darwin":
             target = _get_terminal_app()
@@ -350,17 +368,20 @@ def book(ctx: click.Context, building: tuple[str, ...], headed: bool):
             except Exception:
                 pass
         else:
-            try:
-                subprocess.run(
-                    ["xdotool", "getactivewindow", "windowactivate"],
-                    capture_output=True,
-                    timeout=3,
-                )
-            except Exception:
-                pass
+            if saved_window_id:
+                try:
+                    subprocess.run(
+                        ["xdotool", "windowactivate", saved_window_id],
+                        capture_output=True,
+                        timeout=3,
+                    )
+                except Exception:
+                    pass
 
     _step("Starting EMS Room Booking")
     _info("Press Ctrl+C at any time to abort.")
+
+    linux_terminal_window_id = _get_linux_terminal_window_id()
 
     with sync_playwright() as pw:
         launch_args = [
@@ -383,7 +404,7 @@ def book(ctx: click.Context, building: tuple[str, ...], headed: bool):
 
         if not headed:
             _minimize_browser(page)
-            _focus_terminal()
+            _focus_terminal(linux_terminal_window_id)
 
         building_query = " ".join(building).strip() or None
 

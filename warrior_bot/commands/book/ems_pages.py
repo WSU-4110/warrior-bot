@@ -376,7 +376,7 @@ def scrape_rooms(page: Page) -> list[dict[str, Any]]:
 
     page.wait_for_selector(
         "table#available-list tbody tr, .dynamic-filter-item-add",
-        timeout=10_000,
+        timeout=30_000,
     )
 
     rows = page.locator("table#available-list tbody tr")
