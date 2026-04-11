@@ -75,7 +75,7 @@ class WhereFacade:
         return self._format_building_list(results), True
 
     def search_all(self, query: str) -> tuple[str, bool]:
-        """Search across buildings, restaurants, and details."""
+        """Search across buildings, restaurants, staff, and details."""
         sections: list[str] = []
 
         buildings = self._building_fetcher.search(query)
@@ -89,6 +89,10 @@ class WhereFacade:
                     f"Restaurants matching '{query}'", restaurants
                 )
             )
+
+        staff_result, staff_found = self.search_staff(query.title())
+        if staff_found:
+            sections.append(staff_result)
 
         if sections:
             return "\n".join(sections), True
