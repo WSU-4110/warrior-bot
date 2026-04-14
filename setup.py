@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="warrior-bot",
-    version="0.2.1",
+    version="0.2.2",
     packages=find_packages(),
     package_data={
         "warrior_bot": ["commands/where/data/*.json", "data/*.json"],
